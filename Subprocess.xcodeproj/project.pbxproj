@@ -1,0 +1,783 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6EDDC6C12410379F00E171C6 /* Subprocess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6A52410378100E171C6 /* Subprocess.swift */; };
+		6EDDC6C22410379F00E171C6 /* SubprocessManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6A62410378100E171C6 /* SubprocessManager.swift */; };
+		6EDDC6C32410379F00E171C6 /* Shell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6A72410378100E171C6 /* Shell.swift */; };
+		6EDDC6C42410379F00E171C6 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6A82410378100E171C6 /* Errors.swift */; };
+		6EDDC6C5241037A300E171C6 /* Subprocess.h in Headers */ = {isa = PBXBuildFile; fileRef = 6EDDC6A92410378100E171C6 /* Subprocess.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6EDDC6D6241037DA00E171C6 /* Subprocess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EDDC6382410369400E171C6 /* Subprocess.framework */; };
+		6EDDC6D7241037EE00E171C6 /* SubprocessMocks.h in Headers */ = {isa = PBXBuildFile; fileRef = 6EDDC6AC2410378100E171C6 /* SubprocessMocks.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6EDDC6D8241037F500E171C6 /* MockSubprocess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6AD2410378100E171C6 /* MockSubprocess.swift */; };
+		6EDDC6D9241037F500E171C6 /* MockShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6AE2410378100E171C6 /* MockShell.swift */; };
+		6EDDC6DA241037F500E171C6 /* MockSubprocessManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6AF2410378100E171C6 /* MockSubprocessManager.swift */; };
+		6EDDC6DB241037F500E171C6 /* MockProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6B12410378100E171C6 /* MockProcess.swift */; };
+		6EDDC6E52410391500E171C6 /* Subprocess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EDDC6382410369400E171C6 /* Subprocess.framework */; };
+		6EDDC6F72410395800E171C6 /* XCTestManifests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6B62410378100E171C6 /* XCTestManifests.swift */; };
+		6EDDC6F82410395800E171C6 /* SubprocessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6B72410378100E171C6 /* SubprocessTests.swift */; };
+		6EDDC6F92410395800E171C6 /* ShellTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6B82410378100E171C6 /* ShellTests.swift */; };
+		6EDDC6FA2410396000E171C6 /* XCTestManifests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6BB2410378100E171C6 /* XCTestManifests.swift */; };
+		6EDDC6FB2410396000E171C6 /* SubprocessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6BC2410378100E171C6 /* SubprocessTests.swift */; };
+		6EDDC6FC2410396000E171C6 /* ShellTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6BD2410378100E171C6 /* ShellTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		6EDDC6D3241037D500E171C6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6EDDC62F2410369400E171C6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6EDDC6372410369400E171C6;
+			remoteInfo = Subprocess;
+		};
+		6EDDC6E62410391500E171C6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6EDDC62F2410369400E171C6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6EDDC6372410369400E171C6;
+			remoteInfo = Subprocess;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		6EDDC6382410369400E171C6 /* Subprocess.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Subprocess.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6EDDC6A22410378100E171C6 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
+		6EDDC6A52410378100E171C6 /* Subprocess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subprocess.swift; sourceTree = "<group>"; };
+		6EDDC6A62410378100E171C6 /* SubprocessManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubprocessManager.swift; sourceTree = "<group>"; };
+		6EDDC6A72410378100E171C6 /* Shell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shell.swift; sourceTree = "<group>"; };
+		6EDDC6A82410378100E171C6 /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
+		6EDDC6A92410378100E171C6 /* Subprocess.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Subprocess.h; sourceTree = "<group>"; };
+		6EDDC6AA2410378100E171C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6EDDC6AC2410378100E171C6 /* SubprocessMocks.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SubprocessMocks.h; sourceTree = "<group>"; };
+		6EDDC6AD2410378100E171C6 /* MockSubprocess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSubprocess.swift; sourceTree = "<group>"; };
+		6EDDC6AE2410378100E171C6 /* MockShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockShell.swift; sourceTree = "<group>"; };
+		6EDDC6AF2410378100E171C6 /* MockSubprocessManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSubprocessManager.swift; sourceTree = "<group>"; };
+		6EDDC6B02410378100E171C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6EDDC6B12410378100E171C6 /* MockProcess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockProcess.swift; sourceTree = "<group>"; };
+		6EDDC6B22410378100E171C6 /* Subprocess.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = Subprocess.podspec; sourceTree = "<group>"; };
+		6EDDC6B42410378100E171C6 /* LinuxMain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinuxMain.swift; sourceTree = "<group>"; };
+		6EDDC6B62410378100E171C6 /* XCTestManifests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCTestManifests.swift; sourceTree = "<group>"; };
+		6EDDC6B72410378100E171C6 /* SubprocessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubprocessTests.swift; sourceTree = "<group>"; };
+		6EDDC6B82410378100E171C6 /* ShellTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellTests.swift; sourceTree = "<group>"; };
+		6EDDC6B92410378100E171C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6EDDC6BB2410378100E171C6 /* XCTestManifests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCTestManifests.swift; sourceTree = "<group>"; };
+		6EDDC6BC2410378100E171C6 /* SubprocessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubprocessTests.swift; sourceTree = "<group>"; };
+		6EDDC6BD2410378100E171C6 /* ShellTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellTests.swift; sourceTree = "<group>"; };
+		6EDDC6BE2410378100E171C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6EDDC6BF2410378100E171C6 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		6EDDC6C02410378100E171C6 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		6EDDC6CB241037CE00E171C6 /* SubprocessMocks.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SubprocessMocks.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6EDDC6E02410391500E171C6 /* UnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6EDDC6EF2410392400E171C6 /* SystemTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SystemTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6EDDC6352410369400E171C6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6EDDC6C8241037CE00E171C6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6EDDC6D6241037DA00E171C6 /* Subprocess.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6EDDC6DD2410391500E171C6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6EDDC6E52410391500E171C6 /* Subprocess.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6EDDC6EC2410392400E171C6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6EDDC62E2410369400E171C6 = {
+			isa = PBXGroup;
+			children = (
+				6EDDC6C02410378100E171C6 /* LICENSE */,
+				6EDDC6A22410378100E171C6 /* Package.swift */,
+				6EDDC6BF2410378100E171C6 /* README.md */,
+				6EDDC6B22410378100E171C6 /* Subprocess.podspec */,
+				6EDDC6A32410378100E171C6 /* Sources */,
+				6EDDC6B32410378100E171C6 /* Tests */,
+				6EDDC6392410369400E171C6 /* Products */,
+				6EDDC6D5241037DA00E171C6 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		6EDDC6392410369400E171C6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6EDDC6382410369400E171C6 /* Subprocess.framework */,
+				6EDDC6CB241037CE00E171C6 /* SubprocessMocks.framework */,
+				6EDDC6E02410391500E171C6 /* UnitTests.xctest */,
+				6EDDC6EF2410392400E171C6 /* SystemTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6EDDC6A32410378100E171C6 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				6EDDC6A42410378100E171C6 /* Subprocess */,
+				6EDDC6AB2410378100E171C6 /* SubprocessMocks */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		6EDDC6A42410378100E171C6 /* Subprocess */ = {
+			isa = PBXGroup;
+			children = (
+				6EDDC6A52410378100E171C6 /* Subprocess.swift */,
+				6EDDC6A62410378100E171C6 /* SubprocessManager.swift */,
+				6EDDC6A72410378100E171C6 /* Shell.swift */,
+				6EDDC6A82410378100E171C6 /* Errors.swift */,
+				6EDDC6A92410378100E171C6 /* Subprocess.h */,
+				6EDDC6AA2410378100E171C6 /* Info.plist */,
+			);
+			path = Subprocess;
+			sourceTree = "<group>";
+		};
+		6EDDC6AB2410378100E171C6 /* SubprocessMocks */ = {
+			isa = PBXGroup;
+			children = (
+				6EDDC6AC2410378100E171C6 /* SubprocessMocks.h */,
+				6EDDC6AD2410378100E171C6 /* MockSubprocess.swift */,
+				6EDDC6AE2410378100E171C6 /* MockShell.swift */,
+				6EDDC6AF2410378100E171C6 /* MockSubprocessManager.swift */,
+				6EDDC6B02410378100E171C6 /* Info.plist */,
+				6EDDC6B12410378100E171C6 /* MockProcess.swift */,
+			);
+			path = SubprocessMocks;
+			sourceTree = "<group>";
+		};
+		6EDDC6B32410378100E171C6 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				6EDDC6B42410378100E171C6 /* LinuxMain.swift */,
+				6EDDC6BA2410378100E171C6 /* UnitTests */,
+				6EDDC6B52410378100E171C6 /* SystemTests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		6EDDC6B52410378100E171C6 /* SystemTests */ = {
+			isa = PBXGroup;
+			children = (
+				6EDDC6B62410378100E171C6 /* XCTestManifests.swift */,
+				6EDDC6B72410378100E171C6 /* SubprocessTests.swift */,
+				6EDDC6B82410378100E171C6 /* ShellTests.swift */,
+				6EDDC6B92410378100E171C6 /* Info.plist */,
+			);
+			path = SystemTests;
+			sourceTree = "<group>";
+		};
+		6EDDC6BA2410378100E171C6 /* UnitTests */ = {
+			isa = PBXGroup;
+			children = (
+				6EDDC6BB2410378100E171C6 /* XCTestManifests.swift */,
+				6EDDC6BC2410378100E171C6 /* SubprocessTests.swift */,
+				6EDDC6BD2410378100E171C6 /* ShellTests.swift */,
+				6EDDC6BE2410378100E171C6 /* Info.plist */,
+			);
+			path = UnitTests;
+			sourceTree = "<group>";
+		};
+		6EDDC6D5241037DA00E171C6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		6EDDC6332410369400E171C6 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6EDDC6C5241037A300E171C6 /* Subprocess.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6EDDC6C6241037CE00E171C6 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6EDDC6D7241037EE00E171C6 /* SubprocessMocks.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		6EDDC6372410369400E171C6 /* Subprocess */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6EDDC6402410369400E171C6 /* Build configuration list for PBXNativeTarget "Subprocess" */;
+			buildPhases = (
+				6EDDC6332410369400E171C6 /* Headers */,
+				6EDDC6342410369400E171C6 /* Sources */,
+				6EDDC6352410369400E171C6 /* Frameworks */,
+				6EDDC6362410369400E171C6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Subprocess;
+			productName = Subprocess;
+			productReference = 6EDDC6382410369400E171C6 /* Subprocess.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		6EDDC6CA241037CE00E171C6 /* SubprocessMocks */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6EDDC6D0241037CE00E171C6 /* Build configuration list for PBXNativeTarget "SubprocessMocks" */;
+			buildPhases = (
+				6EDDC6C6241037CE00E171C6 /* Headers */,
+				6EDDC6C7241037CE00E171C6 /* Sources */,
+				6EDDC6C8241037CE00E171C6 /* Frameworks */,
+				6EDDC6C9241037CE00E171C6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6EDDC6D4241037D500E171C6 /* PBXTargetDependency */,
+			);
+			name = SubprocessMocks;
+			productName = SubprocessMocks;
+			productReference = 6EDDC6CB241037CE00E171C6 /* SubprocessMocks.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		6EDDC6DF2410391500E171C6 /* UnitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6EDDC6E82410391500E171C6 /* Build configuration list for PBXNativeTarget "UnitTests" */;
+			buildPhases = (
+				6EDDC6DC2410391500E171C6 /* Sources */,
+				6EDDC6DD2410391500E171C6 /* Frameworks */,
+				6EDDC6DE2410391500E171C6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6EDDC6E72410391500E171C6 /* PBXTargetDependency */,
+			);
+			name = UnitTests;
+			productName = UnitTests;
+			productReference = 6EDDC6E02410391500E171C6 /* UnitTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		6EDDC6EE2410392400E171C6 /* SystemTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6EDDC6F42410392400E171C6 /* Build configuration list for PBXNativeTarget "SystemTests" */;
+			buildPhases = (
+				6EDDC6EB2410392400E171C6 /* Sources */,
+				6EDDC6EC2410392400E171C6 /* Frameworks */,
+				6EDDC6ED2410392400E171C6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SystemTests;
+			productName = SystemTests;
+			productReference = 6EDDC6EF2410392400E171C6 /* SystemTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6EDDC62F2410369400E171C6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1130;
+				LastUpgradeCheck = 1130;
+				ORGANIZATIONNAME = Jamf;
+				TargetAttributes = {
+					6EDDC6372410369400E171C6 = {
+						CreatedOnToolsVersion = 11.3.1;
+					};
+					6EDDC6CA241037CE00E171C6 = {
+						CreatedOnToolsVersion = 11.3.1;
+					};
+					6EDDC6DF2410391500E171C6 = {
+						CreatedOnToolsVersion = 11.3.1;
+					};
+					6EDDC6EE2410392400E171C6 = {
+						CreatedOnToolsVersion = 11.3.1;
+					};
+				};
+			};
+			buildConfigurationList = 6EDDC6322410369400E171C6 /* Build configuration list for PBXProject "Subprocess" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 6EDDC62E2410369400E171C6;
+			productRefGroup = 6EDDC6392410369400E171C6 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6EDDC6372410369400E171C6 /* Subprocess */,
+				6EDDC6CA241037CE00E171C6 /* SubprocessMocks */,
+				6EDDC6DF2410391500E171C6 /* UnitTests */,
+				6EDDC6EE2410392400E171C6 /* SystemTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6EDDC6362410369400E171C6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6EDDC6C9241037CE00E171C6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6EDDC6DE2410391500E171C6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6EDDC6ED2410392400E171C6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6EDDC6342410369400E171C6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6EDDC6C42410379F00E171C6 /* Errors.swift in Sources */,
+				6EDDC6C32410379F00E171C6 /* Shell.swift in Sources */,
+				6EDDC6C22410379F00E171C6 /* SubprocessManager.swift in Sources */,
+				6EDDC6C12410379F00E171C6 /* Subprocess.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6EDDC6C7241037CE00E171C6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6EDDC6D9241037F500E171C6 /* MockShell.swift in Sources */,
+				6EDDC6DB241037F500E171C6 /* MockProcess.swift in Sources */,
+				6EDDC6D8241037F500E171C6 /* MockSubprocess.swift in Sources */,
+				6EDDC6DA241037F500E171C6 /* MockSubprocessManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6EDDC6DC2410391500E171C6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6EDDC6FB2410396000E171C6 /* SubprocessTests.swift in Sources */,
+				6EDDC6FA2410396000E171C6 /* XCTestManifests.swift in Sources */,
+				6EDDC6FC2410396000E171C6 /* ShellTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6EDDC6EB2410392400E171C6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6EDDC6F82410395800E171C6 /* SubprocessTests.swift in Sources */,
+				6EDDC6F72410395800E171C6 /* XCTestManifests.swift in Sources */,
+				6EDDC6F92410395800E171C6 /* ShellTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		6EDDC6D4241037D500E171C6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6EDDC6372410369400E171C6 /* Subprocess */;
+			targetProxy = 6EDDC6D3241037D500E171C6 /* PBXContainerItemProxy */;
+		};
+		6EDDC6E72410391500E171C6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6EDDC6372410369400E171C6 /* Subprocess */;
+			targetProxy = 6EDDC6E62410391500E171C6 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		6EDDC63E2410369400E171C6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		6EDDC63F2410369400E171C6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		6EDDC6412410369400E171C6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = Sources/Subprocess/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jamf.opensource.subprocess.Subprocess;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		6EDDC6422410369400E171C6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = Sources/Subprocess/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jamf.opensource.subprocess.Subprocess;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		6EDDC6D1241037CE00E171C6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = Sources/SubprocessMocks/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jamf.opensource.subprocess.SubprocessMocks;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		6EDDC6D2241037CE00E171C6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = Sources/SubprocessMocks/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jamf.opensource.subprocess.SubprocessMocks;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		6EDDC6E92410391500E171C6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Tests/UnitTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jamf.opensource.subprocess.UnitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		6EDDC6EA2410391500E171C6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Tests/UnitTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jamf.opensource.subprocess.UnitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		6EDDC6F52410392400E171C6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Tests/SystemTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jamf.opensource.subprocess.SystemTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		6EDDC6F62410392400E171C6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Tests/SystemTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jamf.opensource.subprocess.SystemTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6EDDC6322410369400E171C6 /* Build configuration list for PBXProject "Subprocess" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6EDDC63E2410369400E171C6 /* Debug */,
+				6EDDC63F2410369400E171C6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6EDDC6402410369400E171C6 /* Build configuration list for PBXNativeTarget "Subprocess" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6EDDC6412410369400E171C6 /* Debug */,
+				6EDDC6422410369400E171C6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6EDDC6D0241037CE00E171C6 /* Build configuration list for PBXNativeTarget "SubprocessMocks" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6EDDC6D1241037CE00E171C6 /* Debug */,
+				6EDDC6D2241037CE00E171C6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6EDDC6E82410391500E171C6 /* Build configuration list for PBXNativeTarget "UnitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6EDDC6E92410391500E171C6 /* Debug */,
+				6EDDC6EA2410391500E171C6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6EDDC6F42410392400E171C6 /* Build configuration list for PBXNativeTarget "SystemTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6EDDC6F52410392400E171C6 /* Debug */,
+				6EDDC6F62410392400E171C6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6EDDC62F2410369400E171C6 /* Project object */;
+}
