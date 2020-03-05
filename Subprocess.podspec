@@ -20,17 +20,17 @@ Pod::Spec.new do |s|
 
   s.subspec 'Mocks' do |ss|
     ss.source_files = 'Sources/SubprocessMocks/*.swift'
-    ss.dependency = 'Subprocess/Core'
+    ss.dependency 'Subprocess/Core'
   end
 
   s.test_spec 'UnitTests' do |test_spec|
     test_spec.source_files = [ 'Tests/UnitTests/*.swift' ]
-    test_spec.dependency = 'Subprocess/Core'
-    test_spec.dependency = 'Subprocess/Mocks'    
+    test_spec.dependency 'Subprocess/Core'
+    test_spec.dependency 'Subprocess/Mocks'    
   end
   
   s.test_spec 'SystemTests' do |test_spec|
     test_spec.source_files = [ 'Tests/SystemTests/*.swift' ]
-    test_spec.dependency = 'Subprocess/Core'
+    test_spec.dependency 'Subprocess/Core'
   end
 end
