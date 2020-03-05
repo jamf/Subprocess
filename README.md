@@ -1,5 +1,5 @@
 # Subprocess
-![Build]](https://github.com/jamf/Subprocess/workflows/Build%20&%20Test/badge.svg)
+![Build](https://github.com/jamf/Subprocess/workflows/Build%20&%20Test/badge.svg)
 [![License](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](http://mit-license.org)
 [![Platform](https://img.shields.io/badge/platform-macOS-lightgrey.svg?style=flat)](https://developer.apple.com/macos)
 [![Language](http://img.shields.io/badge/language-Swift-lightgrey.svg?style=flat)](https://developer.apple.com/swift)
