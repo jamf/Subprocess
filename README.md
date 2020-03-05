@@ -27,7 +27,6 @@ let data = try Shell(["/usr/bin/grep", "foo"]).exec(input: .file(path: "/path/to
 
 #### Command Output
 
-
 ###### Output as Data
 ```
 let data = try Shell(["/usr/bin/sw_vers"]).exec()
@@ -79,6 +78,39 @@ let errorText = try Shell(command).exec(options: .stderr, encoding: .utf8)
 let outputText = try Shell(command).exec(options: .stdout, encoding: .utf8)
 let combinedData = try Shell(command).exec(options: .combined)
 ```
+### Subprocess
+The Subprocess class can be used for asynchronous command execution.
+
+###### Handling output as it is read
+```
+let command: [String] = ...
+let process = Subprocess(command)
+
+// The outputHandler and errorHandler are invoked serially
+try process.launch(outputHandler: { data in
+    // Handle new data read from stdout
+}, errorHandler: { data in
+    // Handle new data read from stderr
+}, terminationHandler: { process in
+    // Handle process termination, all scheduled calls to
+    // the outputHandler and errorHandler are guaranteed to
+    // have completed.
+})
+```
+###### Handling output on termination
+```
+let command: [String] = ...
+let process = Subprocess(command)
+
+try process.launch { (process, outputData, errorData) in
+    if process.exitCode == 0 {
+        // Do something with output data
+    } else {
+        // Handle failure
+    }
+}
+```
+
 ## Installation
 ### SwiftPM
 ```
