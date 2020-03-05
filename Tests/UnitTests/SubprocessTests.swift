@@ -151,6 +151,7 @@ final class SubprocessTests: XCTestCase {
 
         // Then
         waitForExpectations(timeout: 5.0)
+        Subprocess.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
     
     // MARK: suspend
@@ -175,6 +176,7 @@ final class SubprocessTests: XCTestCase {
         
         // Then
         waitForExpectations(timeout: 5.0)
+        Subprocess.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
 
     // MARK: resume
@@ -199,6 +201,7 @@ final class SubprocessTests: XCTestCase {
         
         // Then
         waitForExpectations(timeout: 5.0)
+        Subprocess.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
 
     // MARK: kill
@@ -223,5 +226,6 @@ final class SubprocessTests: XCTestCase {
         
         // Then
         waitForExpectations(timeout: 5.0)
+        Subprocess.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
 }

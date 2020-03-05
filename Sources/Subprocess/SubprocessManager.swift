@@ -68,9 +68,14 @@ public struct SubprocessManager: SubprocessDependencyManager {
     
     public func createInputPipe(for data: Data) -> Pipe {
         let pipe = Pipe()
-        pipe.fileHandleForReading.writeabilityHandler = { handle in
+        pipe.fileHandleForWriting.writeabilityHandler = { handle in
             handle.write(data)
             handle.writeabilityHandler = nil
+            if #available(OSX 10.15, *) {
+                try? handle.close()
+            } else {
+                handle.closeFile()
+            }
         }
         return pipe
     }
