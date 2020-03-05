@@ -13,6 +13,10 @@ final class ShellTests: XCTestCase {
         ("testExecReturningDecodableObjectFromPropertyList", testExecReturningDecodableObjectFromPropertyList)
     ]
     
+    override func setUp() {
+        SubprocessManager.shared = SubprocessManager()
+    }
+    
     let softwareVersionFilePath = "/System/Library/CoreServices/SystemVersion.plist"
     
     // MARK: Input values
