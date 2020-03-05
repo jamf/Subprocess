@@ -48,7 +48,7 @@ struct LogMessage: Codable {
     var machTimestamp: UInt64
 }
 let command = ["/usr/bin/log", "show", "--style", "json", "--last", "5m"]
-let logs: [LogMessage] try Shell(command).exec(decoder: JSONDecoder())
+let logs: [LogMessage] = try Shell(command).exec(decoder: JSONDecoder())
 ```
 ###### Output as Property List (Array or Dictionary)
 ```
