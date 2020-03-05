@@ -1,6 +1,0 @@
-framework module Subprocess {
-  umbrella header "Subprocess-Mocks-umbrella.h"
-
-  export *
-  module * { export * }
-}
