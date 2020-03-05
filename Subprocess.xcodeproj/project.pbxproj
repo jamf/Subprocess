@@ -25,6 +25,8 @@
 		6EDDC6FA2410396000E171C6 /* XCTestManifests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6BB2410378100E171C6 /* XCTestManifests.swift */; };
 		6EDDC6FB2410396000E171C6 /* SubprocessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6BC2410378100E171C6 /* SubprocessTests.swift */; };
 		6EDDC6FC2410396000E171C6 /* ShellTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6BD2410378100E171C6 /* ShellTests.swift */; };
+		6EDDC6FD24105F8300E171C6 /* SubprocessMocks.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EDDC6CB241037CE00E171C6 /* SubprocessMocks.framework */; };
+		6EDDC6FE24105F8700E171C6 /* Subprocess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EDDC6382410369400E171C6 /* Subprocess.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,6 +98,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6EDDC6FD24105F8300E171C6 /* SubprocessMocks.framework in Frameworks */,
 				6EDDC6E52410391500E171C6 /* Subprocess.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -104,6 +107,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6EDDC6FE24105F8700E171C6 /* Subprocess.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -41,6 +41,8 @@ open class Subprocess {
             
             /// Data to be written to stdin of the child process
             case text(String, String.Encoding)
+            
+            /// File to be written to stdin of the child process
             case file(URL)
         }
         

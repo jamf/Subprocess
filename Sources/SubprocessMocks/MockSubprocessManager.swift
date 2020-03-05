@@ -64,16 +64,16 @@ public extension SubprocessMockObject {
     static func reset() { MockSubprocessManager.shared.reset() }
 }
 
+public class MockFileHandle: FileHandle {
+    public var url: URL?
+}
+
+public class MockPipe: Pipe {
+    public var data: Data?
+}
 
 class MockSubprocessManager {
-    class MockFileHandle: FileHandle {
-        var url: URL?
-    }
-    
-    class MockPipe: Pipe {
-        var data: Data?
-    }
-    
+
     class MockItem {
         var used = false
         var command: [String]

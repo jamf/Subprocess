@@ -88,6 +88,11 @@ open class MockProcessReference: Process {
         
         /// Block called to stub the call to launch
         public var runStub: (MockProcess) throws -> Void
+        
+        var standardInput: Any?
+        var standardOutput: Any?
+        var standardError: Any?
+        var terminationHandler: ((Process) -> Void)?
     }
 
     public var context: Context
@@ -165,6 +170,26 @@ open class MockProcessReference: Process {
         } else {
             context.state = .uncaughtSignal
         }
+    }
+    
+    open override var standardInput: Any? {
+        get { context.standardInput }
+        set { context.standardInput = newValue }
+    }
+    
+    open override var standardOutput: Any? {
+        get { context.standardOutput }
+        set { context.standardOutput = newValue }
+    }
+    
+    open override var standardError: Any? {
+        get { context.standardError }
+        set { context.standardError = newValue }
+    }
+    
+    open override var terminationHandler: ((Process) -> Void)? {
+        get { context.terminationHandler }
+        set { context.terminationHandler = newValue }
     }
     
     open override func resume() -> Bool { stubResume?() ?? false }
