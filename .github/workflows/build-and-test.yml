@@ -1,6 +1,6 @@
-name: Swift
+name: Build & Test
 
-on: [ push, pull_request ]
+on: [push]
 
 jobs:
   spm:
@@ -21,10 +21,4 @@ jobs:
       run: xcodebuild build -scheme 'SubprocessMocks' -derivedDataPath .build
     - name: Run tests
       run: xcodebuild test -scheme 'Subprocess' -derivedDataPath .build
-  cocoapods:
-    name: Cocoapod 
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Spec lint
-      run: pod spec lint --verbose
+
