@@ -1,7 +1,28 @@
 # Subprocess
+![Build & Test](https://github.com/jamf/Subprocess/workflows/Build%20&%20Test/badge.svg)
+
+- [Usage](#usage)
+    - [Shell](#shell-class)
+        - [Input](#command-input)
+   	    		- [Data input](#input-for-data)
+   	    		- [Text input](#input-for-text)
+   	    		- [File input](#input-for-file-url)
+        - [Output](#command-output)			
+    				- [Data output](#output-as-data)
+    				- [Text output](#output-as-string)
+    				- [JSON](#output-as-json)
+    				- [Decodable JSON object](#output-as-decodable-object-from-json)
+    				- [Property list](#output-as-property-list)
+    				- [Decodable property list object](#output-as-decodable-object-from-property-list)
+    - [Subprocess](#subprocess-class)
+    		- [Data input](#input-for-data)
+- [Installation](#installation)
+    - [SwiftPM](#swiftpm)
+    - [Cocoapods](#cocoapods)
+    - [Carthage](#carthage)
 
 # Usage
-### Shell
+### Shell Class
 The Shell class can be used for synchronous command execution.
 
 #### Command Input
@@ -78,7 +99,7 @@ let errorText = try Shell(command).exec(options: .stderr, encoding: .utf8)
 let outputText = try Shell(command).exec(options: .stdout, encoding: .utf8)
 let combinedData = try Shell(command).exec(options: .combined)
 ```
-### Subprocess
+### Subprocess Class
 The Subprocess class can be used for asynchronous command execution.
 
 ###### Handling output as it is read
