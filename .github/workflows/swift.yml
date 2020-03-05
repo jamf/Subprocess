@@ -1,0 +1,30 @@
+name: Swift
+
+on: [ push, pull_request ]
+
+jobs:
+  spm:
+    name: SwiftPM build and test
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build swift packages
+      run: swift build -v
+    - name: Run tests
+      run: swift test -v
+  carthage:
+    name: Xcode project build and test
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build xcode project
+      run: xcodebuild build -scheme 'SubprocessMocks' -derivedDataPath .build
+    - name: Run tests
+      run: xcodebuild test -scheme 'Subprocess' -derivedDataPath .build
+  cocoapods:
+    name: Cocoapod 
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Spec lint
+      run: pod spec lint --verbose
