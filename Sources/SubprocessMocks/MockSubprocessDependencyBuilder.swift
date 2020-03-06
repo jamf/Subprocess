@@ -106,7 +106,6 @@ class MockSubprocessDependencyBuilder {
         mocks.append(mock)
     }
 
-    
     func verify(missedBlock block: (ExpectationError) -> Void) {
         defer { reset() }
         // All of the mocks for errors
@@ -185,11 +184,9 @@ class MockSubprocessDependencyBuilder {
         throw MockSubprocessError.missedExpectations(errors)
     }
 
-
     func reset() {
         mocks = []
     }
-    
 }
 
 extension MockSubprocessDependencyBuilder: SubprocessDependencyFactory {

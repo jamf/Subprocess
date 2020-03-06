@@ -35,6 +35,11 @@ final class ShellTests: XCTestCase {
     
     let command = [ "/usr/local/bin/somefakeCommand", "foo", "bar",  ]
     
+    // This is only needed for SwiftPM since it runs all of the test suites as a single test run
+    override func setUp() {
+        SubprocessDependencyBuilder.shared = SubprocessDependencyBuilder()
+    }
+    
     override func tearDown() {
         Shell.reset()
     }
