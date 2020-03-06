@@ -1,6 +1,6 @@
 import XCTest
 @testable import Subprocess
-import SubprocessMocks
+@testable import SubprocessMocks
 
 final class SubprocessTests: XCTestCase {
     static var allTests = [
@@ -22,9 +22,9 @@ final class SubprocessTests: XCTestCase {
     
     let command = [ "/usr/local/bin/somefakeCommand", "foo", "bar",  ]
 
-    // This is only needed for SwiftPM since it runs all of the test suites as a single test run
     override func setUp() {
-        SubprocessDependencyBuilder.shared = SubprocessDependencyBuilder()
+        // This is only needed for SwiftPM since it runs all of the test suites as a single test run
+        SubprocessDependencyBuilder.shared = MockSubprocessDependencyBuilder.shared
     }
     
     override func tearDown() {
