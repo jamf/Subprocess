@@ -3,22 +3,6 @@ import XCTest
 @testable import SubprocessMocks
 
 final class SubprocessTests: XCTestCase {
-    static var allTests = [
-        ("testInputData", testInputData),
-        ("testInputText", testInputText),
-        ("testInputFilePath", testInputFilePath),
-        ("testInputFileURL", testInputFileURL),
-        
-        ("testGetPID", testGetPID),
-        
-        ("testLaunchWithTerminationHandler", testLaunchWithTerminationHandler),
-        
-        ("testSuspend", testSuspend),
-        
-        ("testResume", testResume),
-        
-        ("testKill", testKill)
-    ]
     
     let command = [ "/usr/local/bin/somefakeCommand", "foo", "bar",  ]
 

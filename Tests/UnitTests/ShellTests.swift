@@ -8,31 +8,7 @@ struct TestCodableObject: Codable, Equatable {
 }
 
 final class ShellTests: XCTestCase {
-    static var allTests = [
-        ("testExecReturningDataWhenExitCodeIsNoneZero", testExecReturningDataWhenExitCodeIsNoneZero),
-        ("testExecReturningDataFromStandardOutput", testExecReturningDataFromStandardOutput),
-        ("testExecReturningDataFromStandardError", testExecReturningDataFromStandardError),
-        ("testExecReturningDataFromBothOutputs", testExecReturningDataFromBothOutputs),
-        
-        ("testExecReturningStringWhenExitCodeIsNoneZero", testExecReturningStringWhenExitCodeIsNoneZero),
-        ("testExecReturningStringWhenOutputEncodingErrorOccurs", testExecReturningStringWhenOutputEncodingErrorOccurs),
-        ("testExecReturningStringFromStandardOutput", testExecReturningStringFromStandardOutput),
-        ("testExecReturningStringFromStandardError", testExecReturningStringFromStandardError),
-        ("testExecReturningStringFromBothOutputs", testExecReturningStringFromBothOutputs),
-        
-        ("testExecReturningJSONArray", testExecReturningJSONArray),
-        ("testExecReturningJSONDictionary", testExecReturningJSONDictionary),
-        ("testExecReturningJSONWithInvalidCast", testExecReturningJSONWithInvalidCast),
 
-        ("testExecReturningPropertyListArray", testExecReturningPropertyListArray),
-        ("testExecReturningPropertyListDictionary", testExecReturningPropertyListDictionary),
-        ("testExecReturningPropertyListWithInvalidCast", testExecReturningPropertyListWithInvalidCast),
-
-        ("testExecReturningDecodableObjectFromJSON", testExecReturningDecodableObjectFromJSON),
-
-        ("testExecReturningDecodableObjectFromPropertyList", testExecReturningDecodableObjectFromPropertyList),
-    ]
-    
     let command = [ "/usr/local/bin/somefakeCommand", "foo", "bar",  ]
     
     override func setUp() {

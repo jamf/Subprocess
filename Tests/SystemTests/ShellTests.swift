@@ -2,17 +2,7 @@ import XCTest
 @testable import Subprocess
 
 final class ShellTests: XCTestCase {
-    static var allTests = [
-        ("testExecWithDataInput", testExecWithDataInput),
-        ("testExecWithFileInput", testExecWithFileInput),
-        ("testExecReturningBoolFromString", testExecReturningBoolFromString),
-        ("testExecReturningString", testExecReturningString),
-        ("testExecReturningJSONObject", testExecReturningJSONObject),
-        ("testExecReturningPropertyList", testExecReturningPropertyList),
-        ("testExecReturningDecodableObjectFromJSON", testExecReturningDecodableObjectFromJSON),
-        ("testExecReturningDecodableObjectFromPropertyList", testExecReturningDecodableObjectFromPropertyList)
-    ]
-    
+
     override func setUp() {
         SubprocessDependencyBuilder.shared = SubprocessDependencyBuilder()
     }

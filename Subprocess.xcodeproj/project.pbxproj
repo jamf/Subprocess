@@ -19,9 +19,7 @@
 		6EDDC6DA241037F500E171C6 /* MockSubprocessDependencyBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6AF2410378100E171C6 /* MockSubprocessDependencyBuilder.swift */; };
 		6EDDC6DB241037F500E171C6 /* MockProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6B12410378100E171C6 /* MockProcess.swift */; };
 		6EDDC6E52410391500E171C6 /* Subprocess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EDDC6382410369400E171C6 /* Subprocess.framework */; };
-		6EDDC6F72410395800E171C6 /* XCTestManifests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6B62410378100E171C6 /* XCTestManifests.swift */; };
 		6EDDC6F92410395800E171C6 /* ShellTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6B82410378100E171C6 /* ShellTests.swift */; };
-		6EDDC6FA2410396000E171C6 /* XCTestManifests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6BB2410378100E171C6 /* XCTestManifests.swift */; };
 		6EDDC6FB2410396000E171C6 /* SubprocessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6BC2410378100E171C6 /* SubprocessTests.swift */; };
 		6EDDC6FC2410396000E171C6 /* ShellTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6BD2410378100E171C6 /* ShellTests.swift */; };
 		6EDDC6FD24105F8300E171C6 /* SubprocessMocks.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EDDC6CB241037CE00E171C6 /* SubprocessMocks.framework */; };
@@ -61,11 +59,8 @@
 		6EDDC6B02410378100E171C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6EDDC6B12410378100E171C6 /* MockProcess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockProcess.swift; sourceTree = "<group>"; };
 		6EDDC6B22410378100E171C6 /* Subprocess.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = Subprocess.podspec; sourceTree = "<group>"; };
-		6EDDC6B42410378100E171C6 /* LinuxMain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinuxMain.swift; sourceTree = "<group>"; };
-		6EDDC6B62410378100E171C6 /* XCTestManifests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCTestManifests.swift; sourceTree = "<group>"; };
 		6EDDC6B82410378100E171C6 /* ShellTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellTests.swift; sourceTree = "<group>"; };
 		6EDDC6B92410378100E171C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		6EDDC6BB2410378100E171C6 /* XCTestManifests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCTestManifests.swift; sourceTree = "<group>"; };
 		6EDDC6BC2410378100E171C6 /* SubprocessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubprocessTests.swift; sourceTree = "<group>"; };
 		6EDDC6BD2410378100E171C6 /* ShellTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellTests.swift; sourceTree = "<group>"; };
 		6EDDC6BE2410378100E171C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -175,7 +170,6 @@
 		6EDDC6B32410378100E171C6 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				6EDDC6B42410378100E171C6 /* LinuxMain.swift */,
 				6EDDC6BA2410378100E171C6 /* UnitTests */,
 				6EDDC6B52410378100E171C6 /* SystemTests */,
 			);
@@ -185,7 +179,6 @@
 		6EDDC6B52410378100E171C6 /* SystemTests */ = {
 			isa = PBXGroup;
 			children = (
-				6EDDC6B62410378100E171C6 /* XCTestManifests.swift */,
 				6EDDC6B82410378100E171C6 /* ShellTests.swift */,
 				6EDDC6B92410378100E171C6 /* Info.plist */,
 			);
@@ -195,7 +188,6 @@
 		6EDDC6BA2410378100E171C6 /* UnitTests */ = {
 			isa = PBXGroup;
 			children = (
-				6EDDC6BB2410378100E171C6 /* XCTestManifests.swift */,
 				6EDDC6BC2410378100E171C6 /* SubprocessTests.swift */,
 				6EDDC6BD2410378100E171C6 /* ShellTests.swift */,
 				6EDDC6BE2410378100E171C6 /* Info.plist */,
@@ -409,7 +401,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				6EDDC6FB2410396000E171C6 /* SubprocessTests.swift in Sources */,
-				6EDDC6FA2410396000E171C6 /* XCTestManifests.swift in Sources */,
 				6EDDC6FC2410396000E171C6 /* ShellTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -418,7 +409,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6EDDC6F72410395800E171C6 /* XCTestManifests.swift in Sources */,
 				6EDDC6F92410395800E171C6 /* ShellTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
