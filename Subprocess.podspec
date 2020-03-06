@@ -9,8 +9,8 @@ Pod::Spec.new do |s|
   s.homepage     = 'https://github.com/jamf/Subprocess'
   s.authors      = { 'Cyrus Ingraham' => 'cyrus.ingraham@jamf.com' }
   s.source       = { :git => "https://github.com/jamf/Subprocess.git", :tag => s.version.to_s }
-  s.platform = :osx, '10.13'
-  s.osx.deployment_target = '10.13'
+  s.platform = :osx, '10.12'
+  s.osx.deployment_target = '10.12'
   s.swift_version = '5.1'
   s.default_subspec = 'Core'
 

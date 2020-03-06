@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "Subprocess",
-    platforms: [ .macOS(.v10_13) ],
+    platforms: [ .macOS(.v10_12) ],
     products: [
         .library(name: "Subprocess", targets: [ "Subprocess" ]),
         .library(name: "SubprocessMocks", targets: [ "SubprocessMocks" ])

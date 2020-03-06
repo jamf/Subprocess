@@ -156,7 +156,11 @@ open class Subprocess {
             terminationHandler?(self)
         }
         
-        try reference.run()
+        if #available(OSX 10.13, *) {
+            try reference.run()
+        } else {
+            reference.launch()
+        }
     }
     
     /// Launches command calling a block when process terminates

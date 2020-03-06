@@ -57,7 +57,11 @@ public struct SubprocessDependencyBuilder: SubprocessDependencyFactory {
     public func createProcess(for command: [String]) -> Process {
         var tmp = command
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: tmp.removeFirst())
+        if #available(OSX 10.13, *) {
+            process.executableURL = URL(fileURLWithPath: tmp.removeFirst())
+        } else {
+            process.launchPath = tmp.removeFirst()
+        }
         process.arguments = tmp
         return process
     }
