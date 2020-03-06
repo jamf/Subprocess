@@ -14,7 +14,7 @@ final class ShellTests: XCTestCase {
     ]
     
     override func setUp() {
-        SubprocessManager.shared = SubprocessManager()
+        SubprocessDependencyBuilder.shared = SubprocessDependencyBuilder()
     }
     
     let softwareVersionFilePath = "/System/Library/CoreServices/SystemVersion.plist"

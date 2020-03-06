@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6EDDC6C12410379F00E171C6 /* Subprocess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6A52410378100E171C6 /* Subprocess.swift */; };
-		6EDDC6C22410379F00E171C6 /* SubprocessManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6A62410378100E171C6 /* SubprocessManager.swift */; };
+		6EDDC6C22410379F00E171C6 /* SubprocessDependencyBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6A62410378100E171C6 /* SubprocessDependencyBuilder.swift */; };
 		6EDDC6C32410379F00E171C6 /* Shell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6A72410378100E171C6 /* Shell.swift */; };
 		6EDDC6C42410379F00E171C6 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6A82410378100E171C6 /* Errors.swift */; };
 		6EDDC6C5241037A300E171C6 /* Subprocess.h in Headers */ = {isa = PBXBuildFile; fileRef = 6EDDC6A92410378100E171C6 /* Subprocess.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -16,7 +16,7 @@
 		6EDDC6D7241037EE00E171C6 /* SubprocessMocks.h in Headers */ = {isa = PBXBuildFile; fileRef = 6EDDC6AC2410378100E171C6 /* SubprocessMocks.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6EDDC6D8241037F500E171C6 /* MockSubprocess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6AD2410378100E171C6 /* MockSubprocess.swift */; };
 		6EDDC6D9241037F500E171C6 /* MockShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6AE2410378100E171C6 /* MockShell.swift */; };
-		6EDDC6DA241037F500E171C6 /* MockSubprocessManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6AF2410378100E171C6 /* MockSubprocessManager.swift */; };
+		6EDDC6DA241037F500E171C6 /* MockSubprocessDependencyBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6AF2410378100E171C6 /* MockSubprocessDependencyBuilder.swift */; };
 		6EDDC6DB241037F500E171C6 /* MockProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6B12410378100E171C6 /* MockProcess.swift */; };
 		6EDDC6E52410391500E171C6 /* Subprocess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EDDC6382410369400E171C6 /* Subprocess.framework */; };
 		6EDDC6F72410395800E171C6 /* XCTestManifests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6B62410378100E171C6 /* XCTestManifests.swift */; };
@@ -49,7 +49,7 @@
 		6EDDC6382410369400E171C6 /* Subprocess.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Subprocess.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6EDDC6A22410378100E171C6 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		6EDDC6A52410378100E171C6 /* Subprocess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subprocess.swift; sourceTree = "<group>"; };
-		6EDDC6A62410378100E171C6 /* SubprocessManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubprocessManager.swift; sourceTree = "<group>"; };
+		6EDDC6A62410378100E171C6 /* SubprocessDependencyBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubprocessDependencyBuilder.swift; sourceTree = "<group>"; };
 		6EDDC6A72410378100E171C6 /* Shell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shell.swift; sourceTree = "<group>"; };
 		6EDDC6A82410378100E171C6 /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
 		6EDDC6A92410378100E171C6 /* Subprocess.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Subprocess.h; sourceTree = "<group>"; };
@@ -57,7 +57,7 @@
 		6EDDC6AC2410378100E171C6 /* SubprocessMocks.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SubprocessMocks.h; sourceTree = "<group>"; };
 		6EDDC6AD2410378100E171C6 /* MockSubprocess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSubprocess.swift; sourceTree = "<group>"; };
 		6EDDC6AE2410378100E171C6 /* MockShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockShell.swift; sourceTree = "<group>"; };
-		6EDDC6AF2410378100E171C6 /* MockSubprocessManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSubprocessManager.swift; sourceTree = "<group>"; };
+		6EDDC6AF2410378100E171C6 /* MockSubprocessDependencyBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSubprocessDependencyBuilder.swift; sourceTree = "<group>"; };
 		6EDDC6B02410378100E171C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6EDDC6B12410378100E171C6 /* MockProcess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockProcess.swift; sourceTree = "<group>"; };
 		6EDDC6B22410378100E171C6 /* Subprocess.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = Subprocess.podspec; sourceTree = "<group>"; };
@@ -150,7 +150,7 @@
 			isa = PBXGroup;
 			children = (
 				6EDDC6A52410378100E171C6 /* Subprocess.swift */,
-				6EDDC6A62410378100E171C6 /* SubprocessManager.swift */,
+				6EDDC6A62410378100E171C6 /* SubprocessDependencyBuilder.swift */,
 				6EDDC6A72410378100E171C6 /* Shell.swift */,
 				6EDDC6A82410378100E171C6 /* Errors.swift */,
 				6EDDC6A92410378100E171C6 /* Subprocess.h */,
@@ -165,7 +165,7 @@
 				6EDDC6AC2410378100E171C6 /* SubprocessMocks.h */,
 				6EDDC6AD2410378100E171C6 /* MockSubprocess.swift */,
 				6EDDC6AE2410378100E171C6 /* MockShell.swift */,
-				6EDDC6AF2410378100E171C6 /* MockSubprocessManager.swift */,
+				6EDDC6AF2410378100E171C6 /* MockSubprocessDependencyBuilder.swift */,
 				6EDDC6B02410378100E171C6 /* Info.plist */,
 				6EDDC6B12410378100E171C6 /* MockProcess.swift */,
 			);
@@ -387,7 +387,7 @@
 			files = (
 				6EDDC6C42410379F00E171C6 /* Errors.swift in Sources */,
 				6EDDC6C32410379F00E171C6 /* Shell.swift in Sources */,
-				6EDDC6C22410379F00E171C6 /* SubprocessManager.swift in Sources */,
+				6EDDC6C22410379F00E171C6 /* SubprocessDependencyBuilder.swift in Sources */,
 				6EDDC6C12410379F00E171C6 /* Subprocess.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -399,7 +399,7 @@
 				6EDDC6D9241037F500E171C6 /* MockShell.swift in Sources */,
 				6EDDC6DB241037F500E171C6 /* MockProcess.swift in Sources */,
 				6EDDC6D8241037F500E171C6 /* MockSubprocess.swift in Sources */,
-				6EDDC6DA241037F500E171C6 /* MockSubprocessManager.swift in Sources */,
+				6EDDC6DA241037F500E171C6 /* MockSubprocessDependencyBuilder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

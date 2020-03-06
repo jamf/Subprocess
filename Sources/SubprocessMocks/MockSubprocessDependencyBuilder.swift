@@ -1,5 +1,5 @@
 //
-//  MockSubprocessManager.swift
+//  MockSubprocessDependencyBuilder.swift
 //  SubprocessMocks
 //
 //  MIT License
@@ -52,16 +52,16 @@ public extension SubprocessMockObject {
     
     /// Verifies expected stubs and resets mocking
     /// - Throws: A `MockSubprocessError.missedExpectations` containing failed expectations
-    static func verify() throws { try MockSubprocessManager.shared.verify() }
+    static func verify() throws { try MockSubprocessDependencyBuilder.shared.verify() }
     
     /// Verifies expected stubs and resets mocking
     /// - Parameter missedBlock: Block called for each failed expectation
     static func verify(missedBlock: (ExpectationError) -> Void) {
-        MockSubprocessManager.shared.verify(missedBlock: missedBlock)
+        MockSubprocessDependencyBuilder.shared.verify(missedBlock: missedBlock)
     }
     
     /// Resets mocking
-    static func reset() { MockSubprocessManager.shared.reset() }
+    static func reset() { MockSubprocessDependencyBuilder.shared.reset() }
 }
 
 public class MockFileHandle: FileHandle {
@@ -72,7 +72,7 @@ public class MockPipe: Pipe {
     public var data: Data?
 }
 
-class MockSubprocessManager {
+class MockSubprocessDependencyBuilder {
 
     class MockItem {
         var used = false
@@ -92,9 +92,9 @@ class MockSubprocessManager {
     
     var mocks: [MockItem] = []
 
-    static let shared = MockSubprocessManager()
+    static let shared = MockSubprocessDependencyBuilder()
     
-    init() { SubprocessManager.shared = self }
+    init() { SubprocessDependencyBuilder.shared = self }
     
     func stub(_ command: [String], process: MockProcessReference) {
         let mock = MockItem(command: command, input: nil, process: process, file: nil, line: nil)
@@ -192,7 +192,7 @@ class MockSubprocessManager {
     
 }
 
-extension MockSubprocessManager: SubprocessDependencyManager {
+extension MockSubprocessDependencyBuilder: SubprocessDependencyFactory {
     func createProcess(for command: [String]) -> Process {
         if let item = mocks.first(where: { !$0.used && $0.command == command }) {
             item.used = true
@@ -213,83 +213,3 @@ extension MockSubprocessManager: SubprocessDependencyManager {
         return pipe
     }
 }
-
-//class MockSubprocessManager: SubprocessDependencyManager {
-//
-//    class MockFileHandle: FileHandle {
-//        var url: URL?
-//    }
-//
-//    class MockPipe: Pipe {
-//        var data: Data?
-//    }
-//
-//    typealias Input = Subprocess.Input
-//
-//    static var shared = MockSubprocessManager()
-//
-//    class ProcessStub {
-//        let command: [String]
-//        var started = false
-//        var process: MockProcessReference
-//        var file: StaticString?
-//        var line: UInt?
-//        var input: Input?
-//        init(command: [String], input: Input? = nil, file: StaticString? = nil, line: UInt? = nil) {
-//            self.command = command
-//            self.input = input
-//            process = MockProcessReference()
-//            var tmp = command
-//            process.executableURL = URL(fileURLWithPath: tmp.removeFirst())
-//            process.arguments = tmp
-//            self.file = file
-//            self.line = line
-//        }
-//    }
-//
-//    private var stubs: [ProcessStub] = []
-//
-//    init() { SubprocessManager.shared = self }
-//
-//
-//    func verify(errorBlock: (MissedExpectedMockError) -> Void) {
-//        defer { reset() }
-//        stubs.forEach {
-//            guard !$0.started, let file = $0.file, let line = $0.line else { return }
-//            let error = MissedExpectedMockError(file: file, line: line, message: "Expected command not called")
-//            errorBlock(error)
-//        }
-//    }
-//
-//    func verify() throws {
-//        var errors: [MissedExpectedMockError] = []
-//        verify { errors.append($0) }
-//        if errors.isEmpty { return }
-//        throw MissedExpectedMocksError(errors: errors)
-//    }
-//
-//
-//    func reset() {
-//        stubs = []
-//    }
-//
-//    func createProcess(for command: [String]) -> Process {
-//        if let stub = stubs.first(where: { !$0.started && $0.command == command }) {
-//            stub.started = true
-//            return stub.process
-//        }
-//        return MockProcessReference()
-//    }
-//
-//    func createInputFileHandle(for url: URL) throws -> FileHandle {
-//        let handle = MockFileHandle()
-//        handle.url = url
-//        return handle
-//    }
-//
-//    func createInputPipe(for data: Data) -> Pipe {
-//        let pipe = MockPipe()
-//        pipe.data = data
-//        return pipe
-//    }
-//}

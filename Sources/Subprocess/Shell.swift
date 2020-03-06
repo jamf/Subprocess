@@ -69,9 +69,8 @@ public class Shell {
         var buffer = Data()
         try process.launch(input: input,
                            outputHandler: options.contains(.stdout) ? { buffer.append($0) } : nil,
-                           errorHandler: options.contains(.stderr) ? { buffer.append($0) } : nil,
-                           terminationHandler: { _ in })
-        process.waitForTermaination()
+                           errorHandler: options.contains(.stderr) ? { buffer.append($0) } : nil)
+        process.waitForTermination()
         return try transformBlock(process, buffer)
     }
     
@@ -81,7 +80,7 @@ public class Shell {
     ///     - input: File or data to write to standard input of the process  (Default: nil)
     ///     - options: Output options defining the output to process (Default: .stdout)
     /// - Returns: Process output data
-    /// - Throws: Error from process launch or  if termination code is none-zero
+    /// - Throws: Error from process launch or if termination code is none-zero
     public func exec(input: Input? = nil, options: OutputOptions = .stdout) throws -> Data {
         return try exec(input: input, options: options) { process, data in
             let exitCode = process.exitCode

@@ -1,5 +1,5 @@
 //
-//  SubprocessError.swift
+//  Errors.swift
 //  Subprocess
 //
 //  MIT License

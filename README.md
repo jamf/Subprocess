@@ -80,7 +80,7 @@ struct SystemVersion: Codable {
     var version: String
 }
 let command = ["/bin/cat", "/System/Library/CoreServices/SystemVersion.plist"]
-let result: SystemVersion = try Shell(["/bin/cat", softwareVersionFilePath]).exec(decoder: PropertyListDecoder())
+let result: SystemVersion = try Shell(command).exec(decoder: PropertyListDecoder())
 ```
 ###### Output mapped to other type 
 ```swift

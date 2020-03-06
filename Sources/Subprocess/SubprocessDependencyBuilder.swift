@@ -1,5 +1,5 @@
 //
-//  SubprocessManager.swift
+//  SubprocessDependencyBuilder.swift
 //  Subprocess
 //
 //  MIT License
@@ -28,7 +28,7 @@
 import Foundation
 
 /// Protocol call used for dependency injection
-public protocol SubprocessDependencyManager {
+public protocol SubprocessDependencyFactory {
     /// Creates new Subprocess
     ///
     /// - Parameter command: Command represented as an array of strings
@@ -49,10 +49,10 @@ public protocol SubprocessDependencyManager {
     func createInputPipe(for data: Data) -> Pipe
 }
 
-/// Default implementation of SubprocessDependencyManager
-public struct SubprocessManager: SubprocessDependencyManager {
+/// Default implementation of SubprocessDependencyFactory
+public struct SubprocessDependencyBuilder: SubprocessDependencyFactory {
     
-    public static var shared: SubprocessDependencyManager = SubprocessManager()
+    public static var shared: SubprocessDependencyFactory = SubprocessDependencyBuilder()
 
     public func createProcess(for command: [String]) -> Process {
         var tmp = command

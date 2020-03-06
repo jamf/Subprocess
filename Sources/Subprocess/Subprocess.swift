@@ -39,7 +39,7 @@ open class Subprocess {
             /// Data to be written to stdin of the child process
             case data(Data)
             
-            /// Data to be written to stdin of the child process
+            /// Text to be written to stdin of the child process
             case text(String, String.Encoding)
             
             /// File to be written to stdin of the child process
@@ -47,7 +47,7 @@ open class Subprocess {
         }
         
         /// Reference to the input value
-        public var value: Value
+        public let value: Value
         
         /// Creates input for writing data to stdin of the child process
         /// - Parameter data: Data written to stdin of the child process
@@ -82,18 +82,18 @@ open class Subprocess {
         func createPipeOrFileHandle() throws -> Any {
             switch value {
             case .data(let data):
-                return SubprocessManager.shared.createInputPipe(for: data)
+                return SubprocessDependencyBuilder.shared.createInputPipe(for: data)
             case .text(let text, let encoding):
                 guard let data = text.data(using: encoding) else { throw SubprocessError.inputStringEncodingError }
-                return SubprocessManager.shared.createInputPipe(for: data)
+                return SubprocessDependencyBuilder.shared.createInputPipe(for: data)
             case .file(let url):
-                return try SubprocessManager.shared.createInputFileHandle(for: url)
+                return try SubprocessDependencyBuilder.shared.createInputFileHandle(for: url)
             }
         }
     }
     
     /// Process reference
-    public let reference: Process
+    let reference: Process
 
     /// Process identifier
     public var pid: Int32 { reference.processIdentifier }
@@ -101,6 +101,7 @@ open class Subprocess {
     /// Exit code of the process
     public var exitCode: Int32 { reference.terminationStatus }
     
+    /// Returns whether the process is still running.
     public var isRunning: Bool { reference.isRunning }
     
     /// Reason for process termination
@@ -110,7 +111,7 @@ open class Subprocess {
     ///
     /// - Parameter command: Command represented as an array of strings
     public init(_ command: [String], qos: DispatchQoS = .default) {
-        reference = SubprocessManager.shared.createProcess(for: command)
+        reference = SubprocessDependencyBuilder.shared.createProcess(for: command)
         queue = DispatchQueue(label: "SubprocessQueue",
                               qos: qos,
                               attributes: [],
@@ -129,7 +130,7 @@ open class Subprocess {
     public func launch(input: Input? = nil,
                        outputHandler: ((Data) -> Void)? = nil,
                        errorHandler: ((Data) -> Void)? = nil,
-                       terminationHandler: @escaping (Subprocess) -> Void) throws {
+                       terminationHandler: ((Subprocess) -> Void)? = nil) throws {
         
         reference.standardInput = try input?.createPipeOrFileHandle()
         
@@ -152,7 +153,7 @@ open class Subprocess {
         }
         
         group.notify(queue: queue) {
-            terminationHandler(self)
+            terminationHandler?(self)
         }
         
         try reference.run()
@@ -191,7 +192,7 @@ open class Subprocess {
     }
 
     /// Waits for process to complete and all handlers to be called
-    public func waitForTermaination() {
+    public func waitForTermination() {
         group.wait()
     }
     

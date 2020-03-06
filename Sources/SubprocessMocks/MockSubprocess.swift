@@ -39,7 +39,7 @@ public extension Subprocess {
     ///     - error: Error thrown when `Process.run` is called
     static func stub(_ command: [String], error: Error) {
         let mock = MockProcessReference(withRunError: error)
-        MockSubprocessManager.shared.stub(command, process: mock)
+        MockSubprocessDependencyBuilder.shared.stub(command, process: mock)
     }
 
     /// Adds a mock for a given command which calls the run block to mock process execution
@@ -49,7 +49,7 @@ public extension Subprocess {
     ///     - runBlock: Block called with a `MockProcess` to mock process execution. You must call`MockProcess.exit` for the process to complete
     static func stub(_ command: [String], runBlock: ((MockProcess) -> Void)? = nil) {
         let mock = MockProcessReference(withRunBlock: runBlock ?? { $0.exit() })
-        MockSubprocessManager.shared.stub(command, process: mock)
+        MockSubprocessDependencyBuilder.shared.stub(command, process: mock)
     }
 
     /// Adds an expected mock for a given command which throws an error when `Process.run` is called
@@ -62,7 +62,7 @@ public extension Subprocess {
     ///     - line: Line number of source file where expect was called (Default: #line)
     static func expect(_ command: [String], input: Input? = nil, error: Error, file: StaticString = #file, line: UInt = #line) {
         let mock = MockProcessReference(withRunError: error)
-        MockSubprocessManager.shared.expect(command, input: input, process: mock, file: file, line: line)
+        MockSubprocessDependencyBuilder.shared.expect(command, input: input, process: mock, file: file, line: line)
     }
 
     /// Adds an expected mock for a given command which calls the run block to mock process execution
@@ -75,6 +75,6 @@ public extension Subprocess {
     ///     - runBlock: Block called with a `MockProcess` to mock process execution. You must call`MockProcess.exit` for the process to complete
     static func expect(_ command: [String], input: Input? = nil, file: StaticString = #file, line: UInt = #line, runBlock: ((MockProcess) -> Void)? = nil) {
         let mock = MockProcessReference(withRunBlock: runBlock ?? { $0.exit() })
-        MockSubprocessManager.shared.expect(command, input: input, process: mock, file: file, line: line)
+        MockSubprocessDependencyBuilder.shared.expect(command, input: input, process: mock, file: file, line: line)
     }
 }
