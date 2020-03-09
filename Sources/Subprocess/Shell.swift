@@ -29,24 +29,22 @@ import Foundation
 
 /// Class used for synchronous process execution
 public class Shell {
-    
-    public typealias Input = Subprocess.Input
-    
+
     /// OptionSet representing output handling
     public struct OutputOptions: OptionSet {
         public let rawValue: Int
-        
+
         /// Processes data written to stdout
         public static let stdout = OutputOptions(rawValue: 1 << 0)
-        
+
         /// Processes data written to stderr
         public static let stderr = OutputOptions(rawValue: 1 << 1)
-        
+
         /// Processes data written to both stdout and stderr
         public static let combined: OutputOptions = [ .stdout, .stderr ]
         public init(rawValue: Int) { self.rawValue = rawValue }
     }
-    
+
     /// Reference to subprocess
     public let process: Subprocess
 
@@ -56,7 +54,7 @@ public class Shell {
     public init(_ command: [String]) {
         process = Subprocess(command)
     }
-    
+
     /// Executes shell command using a supplied block to tranform the process output into whatever type you would like
     ///
     /// - Parameters:
@@ -65,7 +63,9 @@ public class Shell {
     ///     - transformBlock: Block executed given a reference to the completed process and the output
     /// - Returns: Process output as output type of the `transformBlock`
     /// - Throws: Error from process launch,`transformBlock` or failing create a string from the process output
-    public func exec<T>(input: Input? = nil, options: OutputOptions = .stdout, transformBlock: (_ process: Subprocess, _ data: Data) throws -> T) throws -> T {
+    public func exec<T>(input: Input? = nil,
+                        options: OutputOptions = .stdout,
+                        transformBlock: (_ process: Subprocess, _ data: Data) throws -> T) throws -> T {
         var buffer = Data()
         try process.launch(input: input,
                            outputHandler: options.contains(.stdout) ? { buffer.append($0) } : nil,
@@ -73,7 +73,7 @@ public class Shell {
         process.waitForTermination()
         return try transformBlock(process, buffer)
     }
-    
+
     /// Executes shell command expecting exit code of zero and returning the output data
     ///
     /// - Parameters:
@@ -88,8 +88,9 @@ public class Shell {
             return data
         }
     }
-    
-    /// Executes shell command using a supplied block to tranform the process output as a String into whatever type you would like
+
+    /// Executes shell command using a supplied block to tranform the process output as a String
+    /// into whatever type you would like
     ///
     /// - Parameters:
     ///     - input: File or data to write to standard input of the process  (Default: nil)
@@ -98,13 +99,18 @@ public class Shell {
     ///     - transformBlock: Block executed given a reference to the completed process and the output as a string
     /// - Returns: Process output as output type of the `transformBlock`
     /// - Throws: Error from process launch,`transformBlock` or failing create a string from the process output
-    public func exec<T>(input: Input? = nil, options: OutputOptions = .stdout, encoding: String.Encoding, transformBlock: (_ process: Subprocess, _ string: String) throws -> T) throws -> T {
+    public func exec<T>(input: Input? = nil,
+                        options: OutputOptions = .stdout,
+                        encoding: String.Encoding,
+                        transformBlock: (_ process: Subprocess, _ string: String) throws -> T) throws -> T {
         return try exec(input: input, options: options) { process, data in
-            guard let text = String(data: data, encoding: encoding) else { throw SubprocessError.outputStringEncodingError }
+            guard let text = String(data: data, encoding: encoding) else {
+                throw SubprocessError.outputStringEncodingError
+            }
             return try transformBlock(process, text)
         }
     }
-    
+
     /// Executes shell command expecting exit code of zero and returning the output as a string
     ///
     /// - Parameters:
@@ -112,15 +118,17 @@ public class Shell {
     ///     - options: Output options defining the output to process (Default: .stdout)
     ///     - encoding: Encoding to use for the output
     /// - Returns: Process output as a String
-    /// - Throws: Error from process launch, if termination code is none-zero or failing create a string from the process output
-    public func exec(input: Input? = nil, options: OutputOptions = .stdout, encoding: String.Encoding) throws -> String {
+    /// - Throws: Error from process launch, if termination code is none-zero or failing create a string from the output
+    public func exec(input: Input? = nil,
+                     options: OutputOptions = .stdout,
+                     encoding: String.Encoding) throws -> String {
         return try exec(input: input, options: options, encoding: encoding) { process, text in
             let exitCode = process.exitCode
             guard exitCode == 0 else { throw SubprocessError.exitedWithNoneZeroStatus(exitCode) }
             return text
         }
     }
-    
+
     /// Executes shell command expecting JSON
     ///
     /// - Parameters:
@@ -137,7 +145,7 @@ public class Shell {
             return value
         }
     }
-    
+
     /// Executes shell command expecting a property list
     ///
     /// - Parameters:
@@ -154,7 +162,7 @@ public class Shell {
             return value
         }
     }
-    
+
     /// Executes shell command expecting JSON and decodes object conforming to Decodable
     ///
     /// - Parameters:
@@ -163,10 +171,12 @@ public class Shell {
     ///     - decoder: JSONDecoder instance used for decoding the output object
     /// - Returns: Process output as the decodable object type
     /// - Throws: Error from process launch or JSONDecoder
-    public func exec<T: Decodable>(input: Input? = nil, options: OutputOptions = .stdout, decoder: JSONDecoder) throws -> T {
+    public func exec<T: Decodable>(input: Input? = nil,
+                                   options: OutputOptions = .stdout,
+                                   decoder: JSONDecoder) throws -> T {
         return try exec(input: input, options: options) { _, data in try decoder.decode(T.self, from: data) }
     }
-    
+
     /// Executes shell command expecting property list and decodes object conforming to Decodable
     ///
     /// - Parameters:
@@ -175,7 +185,9 @@ public class Shell {
     ///     - decoder: PropertyListDecoder instance used for decoding the output object
     /// - Returns: Process output as the decodable object type
     /// - Throws: Error from process launch or PropertyListDecoder
-    public func exec<T: Decodable>(input: Input? = nil, options: OutputOptions = .stdout, decoder: PropertyListDecoder) throws -> T {
+    public func exec<T: Decodable>(input: Input? = nil,
+                                   options: OutputOptions = .stdout,
+                                   decoder: PropertyListDecoder) throws -> T {
         return try exec(input: input, options: options) { _, data in try decoder.decode(T.self, from: data) }
     }
 }

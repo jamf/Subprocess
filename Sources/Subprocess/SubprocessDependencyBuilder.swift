@@ -34,14 +34,14 @@ public protocol SubprocessDependencyFactory {
     /// - Parameter command: Command represented as an array of strings
     /// - Returns: New Subprocess instance
     func createProcess(for command: [String]) -> Process
-    
+
     /// Creates a FileHandle for reading
     ///
     /// - Parameter url: File URL
     /// - Returns: New FileHandle for reading
     /// - Throws: When unable to open file for reading
     func createInputFileHandle(for url: URL) throws -> FileHandle
-    
+
     /// Creates a Pipe and writes given data
     ///
     /// - Parameter data: Data to write to the Pipe
@@ -51,7 +51,7 @@ public protocol SubprocessDependencyFactory {
 
 /// Default implementation of SubprocessDependencyFactory
 public struct SubprocessDependencyBuilder: SubprocessDependencyFactory {
-    
+
     public static var shared: SubprocessDependencyFactory = SubprocessDependencyBuilder()
 
     public func createProcess(for command: [String]) -> Process {
@@ -65,11 +65,11 @@ public struct SubprocessDependencyBuilder: SubprocessDependencyFactory {
         process.arguments = tmp
         return process
     }
-    
+
     public func createInputFileHandle(for url: URL) throws -> FileHandle {
         return try FileHandle(forReadingFrom: url)
     }
-    
+
     public func createInputPipe(for data: Data) -> Pipe {
         let pipe = Pipe()
         pipe.fileHandleForWriting.writeabilityHandler = { handle in

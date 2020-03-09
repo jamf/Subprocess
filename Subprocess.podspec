@@ -26,7 +26,7 @@ Pod::Spec.new do |s|
   s.test_spec 'UnitTests' do |test_spec|
     test_spec.source_files = [ 'Tests/UnitTests/*.swift' ]
     test_spec.dependency 'Subprocess/Core'
-    test_spec.dependency 'Subprocess/Mocks'    
+    test_spec.dependency 'Subprocess/Mocks'
   end
   
   s.test_spec 'SystemTests' do |test_spec|

@@ -12,8 +12,8 @@ let package = Package(
     ],
     dependencies: [],
     targets: [
-        .target( name: "Subprocess",  dependencies: []),
-        .target( name: "SubprocessMocks",  dependencies: [ "Subprocess" ]),
+        .target( name: "Subprocess", dependencies: []),
+        .target( name: "SubprocessMocks", dependencies: [ "Subprocess" ]),
         .testTarget(name: "UnitTests", dependencies: [ "Subprocess", "SubprocessMocks" ]),
         .testTarget(name: "SystemTests", dependencies: [ "Subprocess" ])
     ]

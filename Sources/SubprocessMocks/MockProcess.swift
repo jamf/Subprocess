@@ -30,36 +30,36 @@ import Subprocess
 
 /// Interface used for mocking a process
 public struct MockProcess {
-    
+
     /// The underlying `MockProcessReference`
     public var reference: MockProcessReference
-    
+
     /// Writes given data to standard out of the mock child process
     /// - Parameter data: Data to write to standard out of the mock child process
     public func writeTo(stdout data: Data) {
         reference.standardOutputPipe?.fileHandleForWriting.write(data)
     }
-    
+
     /// Writes given text to standard out of the mock child process
     /// - Parameter text: Text to write to standard out of the mock child process
     public func writeTo(stdout text: String, encoding: String.Encoding = .utf8) {
         guard let data = text.data(using: encoding) else { return }
         reference.standardOutputPipe?.fileHandleForWriting.write(data)
     }
-    
+
     /// Writes given data to standard error of the mock child process
     /// - Parameter data: Data to write to standard error of the mock child process
     public func writeTo(stderr data: Data) {
         reference.standardErrorPipe?.fileHandleForWriting.write(data)
     }
-    
+
     /// Writes given text to standard error of the mock child process
     /// - Parameter text: Text to write to standard error of the mock child process
     public func writeTo(stderr text: String, encoding: String.Encoding = .utf8) {
         guard let data = text.data(using: encoding) else { return }
         reference.standardErrorPipe?.fileHandleForWriting.write(data)
     }
-    
+
     /// Completes the mock process execution
     /// - Parameters:
     ///     - statusCode: Exit code of the process (Default: 0)
@@ -71,10 +71,11 @@ public struct MockProcess {
 
 /// Subclass of `Process` used for mocking
 open class MockProcessReference: Process {
-    
+    // swiftlint:disable nesting
+
     /// Context information and values used for overriden properties
     public struct Context {
-        
+
         /// State of the mock process
         public enum State {
             case initialized
@@ -85,25 +86,25 @@ open class MockProcessReference: Process {
         public var terminationStatus: Int32 = 0
         public var processIdentifier: Int32 = -1
         public var state: State = .initialized
-        
+
         /// Block called to stub the call to launch
         public var runStub: (MockProcess) throws -> Void
-        
+
         var standardInput: Any?
         var standardOutput: Any?
         var standardError: Any?
         var terminationHandler: ((Process) -> Void)?
     }
+    // swiftlint:enable nesting
 
     public var context: Context
-    
-    
+
     /// Creates a new `MockProcessReference` which throws an error on launch
     /// - Parameter error: Error thrown when `Process.run` is called
     public init(withRunError error: Error) {
         context = Context(runStub: { _ in throw error })
     }
-    
+
     /// Creates a new `MockProcessReference` calling run stub block
     /// - Parameter block: Block used to stub `Process.run`
     public init(withRunBlock block: @escaping (MockProcess) -> Void) {
@@ -113,19 +114,19 @@ open class MockProcessReference: Process {
             }
         })
     }
-    
+
     /// Block called when `Process.terminate` is called
     public var stubTerminate: ((MockProcessReference) -> Void)?
-    
+
     /// Block called when `Process.resume` is called
     public var stubResume: (() -> Bool)?
-    
+
     /// Block called when `Process.suspend` is called
     public var stubSuspend: (() -> Bool)?
 
     /// standardOutput object as a Pipe
     public var standardOutputPipe: Pipe? { standardOutput as? Pipe }
-    
+
     /// standardError object as a Pipe
     public var standardErrorPipe: Pipe? { standardError as? Pipe }
 
@@ -149,12 +150,17 @@ open class MockProcessReference: Process {
         terminationHandler = nil
         handler(self)
     }
-    
-    open override var terminationReason: TerminationReason { context.state == .uncaughtSignal ? .uncaughtSignal : .exit }
+
+    open override var terminationReason: TerminationReason {
+        context.state == .uncaughtSignal ? .uncaughtSignal : .exit
+    }
+
     open override var terminationStatus: Int32 { context.terminationStatus }
+
     open override var processIdentifier: Int32 { context.processIdentifier }
+
     open override var isRunning: Bool { context.state == .running }
-    
+
     open override func run() throws {
         guard context.state == .initialized else { return }
         context.state = .running
@@ -162,7 +168,6 @@ open class MockProcessReference: Process {
         let mock = MockProcess(reference: self)
         try context.runStub(mock)
     }
-    
 
     open override func terminate() {
         if let stub = stubTerminate {
@@ -171,28 +176,28 @@ open class MockProcessReference: Process {
             context.state = .uncaughtSignal
         }
     }
-    
+
     open override var standardInput: Any? {
         get { context.standardInput }
         set { context.standardInput = newValue }
     }
-    
+
     open override var standardOutput: Any? {
         get { context.standardOutput }
         set { context.standardOutput = newValue }
     }
-    
+
     open override var standardError: Any? {
         get { context.standardError }
         set { context.standardError = newValue }
     }
-    
+
     open override var terminationHandler: ((Process) -> Void)? {
         get { context.terminationHandler }
         set { context.terminationHandler = newValue }
     }
-    
+
     open override func resume() -> Bool { stubResume?() ?? false }
-    
+
     open override func suspend() -> Bool { stubSuspend?() ?? false }
 }

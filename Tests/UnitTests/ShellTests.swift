@@ -7,21 +7,22 @@ struct TestCodableObject: Codable, Equatable {
     init() { uuid = UUID() }
 }
 
+// swiftlint:disable control_statement
 final class ShellTests: XCTestCase {
 
-    let command = [ "/usr/local/bin/somefakeCommand", "foo", "bar",  ]
-    
+    let command = [ "/usr/local/bin/somefakeCommand", "foo", "bar"  ]
+
     override func setUp() {
         // This is only needed for SwiftPM since it runs all of the test suites as a single test run
         SubprocessDependencyBuilder.shared = MockSubprocessDependencyBuilder.shared
     }
-    
+
     override func tearDown() {
         Shell.reset()
     }
 
     // MARK: Data
-    
+
     func testExecReturningDataWhenExitCodeIsNoneZero() {
         // Given
         let exitCode = Int32.random(in: 1...Int32.max)
@@ -39,12 +40,15 @@ final class ShellTests: XCTestCase {
         // Then
         Shell.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
-    
+
     func testExecReturningDataFromStandardOutput() {
         // Given
         var result: Data?
-        let expected = Data([ UInt8.random(in: 0...UInt8.max), UInt8.random(in: 0...UInt8.max), UInt8.random(in: 0...UInt8.max) ])
-        Shell.expect(command, input: nil, standardOutput: expected, standardError: Data([ UInt8.random(in: 0...UInt8.max) ]))
+        let expected = Data([ UInt8.random(in: 0...UInt8.max),
+                              UInt8.random(in: 0...UInt8.max),
+                              UInt8.random(in: 0...UInt8.max) ])
+        let errorData = Data([ UInt8.random(in: 0...UInt8.max) ])
+        Shell.expect(command, input: nil, standardOutput: expected, standardError: errorData)
 
         // When
         XCTAssertNoThrow(result = try Shell(command).exec())
@@ -53,12 +57,15 @@ final class ShellTests: XCTestCase {
         XCTAssertEqual(expected, result)
         Shell.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
-    
+
     func testExecReturningDataFromStandardError() {
         // Given
         var result: Data?
-        let expected = Data([ UInt8.random(in: 0...UInt8.max), UInt8.random(in: 0...UInt8.max), UInt8.random(in: 0...UInt8.max) ])
-        Shell.expect(command, input: nil, standardOutput: Data([ UInt8.random(in: 0...UInt8.max) ]), standardError: expected)
+        let expected = Data([ UInt8.random(in: 0...UInt8.max),
+                              UInt8.random(in: 0...UInt8.max),
+                              UInt8.random(in: 0...UInt8.max) ])
+        let stdOutData = Data([ UInt8.random(in: 0...UInt8.max) ])
+        Shell.expect(command, input: nil, standardOutput: stdOutData, standardError: expected)
 
         // When
         XCTAssertNoThrow(result = try Shell(command).exec(options: .stderr))
@@ -67,7 +74,7 @@ final class ShellTests: XCTestCase {
         XCTAssertEqual(expected, result)
         Shell.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
-    
+
     func testExecReturningDataFromBothOutputs() {
         // Given
         var result = Data()
@@ -87,9 +94,9 @@ final class ShellTests: XCTestCase {
         XCTAssertTrue(text?.contains(expectedStderr) ?? false)
         Shell.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
-        
+
     // MARK: String
-    
+
     func testExecReturningStringWhenExitCodeIsNoneZero() {
         // Given
         let exitCode = Int32.random(in: 1...Int32.max)
@@ -107,10 +114,10 @@ final class ShellTests: XCTestCase {
         // Then
         Shell.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
-    
+
     func testExecReturningStringWhenOutputEncodingErrorOccurs() {
         // Given
-        let invalidData = Data([0xFF, 0xFF, 0xFF, 0xFF,])
+        let invalidData = Data([ 0xFF, 0xFF, 0xFF, 0xFF ])
         Shell.expect(command, input: nil, standardOutput: invalidData)
 
         // When
@@ -124,7 +131,7 @@ final class ShellTests: XCTestCase {
         // Then
         Shell.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
-    
+
     func testExecReturningStringFromStandardOutput() {
         // Given
         var result: String?
@@ -138,7 +145,7 @@ final class ShellTests: XCTestCase {
         XCTAssertEqual(expected, result)
         Shell.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
-    
+
     func testExecReturningStringFromStandardError() {
         // Given
         var result: String?
@@ -152,7 +159,7 @@ final class ShellTests: XCTestCase {
         XCTAssertEqual(expected, result)
         Shell.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
-    
+
     func testExecReturningStringFromBothOutputs() {
         // Given
         var result: String?
@@ -168,9 +175,9 @@ final class ShellTests: XCTestCase {
         XCTAssertTrue(result?.contains(expectedStderr) ?? false)
         Shell.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
-    
+
     // MARK: JSON object
-    
+
     func testExecReturningJSONArray() {
         // Given
         var result: [String]?
@@ -179,7 +186,7 @@ final class ShellTests: XCTestCase {
             UUID().uuidString
         ]
         XCTAssertNoThrow(try Shell.expect(command, input: nil, json: expected))
-        
+
         // When
         XCTAssertNoThrow(result = try Shell(command).execJSON())
 
@@ -187,7 +194,7 @@ final class ShellTests: XCTestCase {
         XCTAssertEqual(expected, result)
         Shell.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
-    
+
     func testExecReturningJSONDictionary() {
         // Given
         var result: [String: [String: String]]?
@@ -200,7 +207,7 @@ final class ShellTests: XCTestCase {
             ]
         ]
         XCTAssertNoThrow(try Shell.expect(command, input: nil, json: expected))
-        
+
         // When
         XCTAssertNoThrow(result = try Shell(command).execJSON())
 
@@ -208,7 +215,7 @@ final class ShellTests: XCTestCase {
         XCTAssertEqual(expected, result)
         Shell.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
-    
+
     func testExecReturningJSONWithInvalidCast() {
         // Given
         var result: [String]?
@@ -221,7 +228,7 @@ final class ShellTests: XCTestCase {
             ]
         ]
         XCTAssertNoThrow(try Shell.expect(command, input: nil, json: expected))
-        
+
         // When
         XCTAssertThrowsError(result = try Shell(command).execJSON()) {
             switch ($0 as? SubprocessError) {
@@ -237,7 +244,7 @@ final class ShellTests: XCTestCase {
     }
 
     // MARK: Property list object
-    
+
     func testExecReturningPropertyListArray() {
         // Given
         var result: [String]?
@@ -246,7 +253,7 @@ final class ShellTests: XCTestCase {
             UUID().uuidString
         ]
         XCTAssertNoThrow(try Shell.expect(command, input: nil, plist: expected))
-        
+
         // When
         XCTAssertNoThrow(result = try Shell(command).execPropertyList())
 
@@ -254,7 +261,7 @@ final class ShellTests: XCTestCase {
         XCTAssertEqual(expected, result)
         Shell.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
-    
+
     func testExecReturningPropertyListDictionary() {
         // Given
         var result: [String: [String: String]]?
@@ -267,7 +274,7 @@ final class ShellTests: XCTestCase {
             ]
         ]
         XCTAssertNoThrow(try Shell.expect(command, input: nil, plist: expected))
-        
+
         // When
         XCTAssertNoThrow(result = try Shell(command).execPropertyList())
 
@@ -275,7 +282,7 @@ final class ShellTests: XCTestCase {
         XCTAssertEqual(expected, result)
         Shell.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
-    
+
     func testExecReturningPropertyListWithInvalidCast() {
         // Given
         var result: [String]?
@@ -288,7 +295,7 @@ final class ShellTests: XCTestCase {
             ]
         ]
         XCTAssertNoThrow(try Shell.expect(command, input: nil, plist: expected))
-        
+
         // When
         XCTAssertThrowsError(result = try Shell(command).execPropertyList()) {
             switch ($0 as? SubprocessError) {
@@ -302,15 +309,15 @@ final class ShellTests: XCTestCase {
         XCTAssertNil(result)
         Shell.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
-    
+
     // MARK: Decodable object from JSON
-    
+
     func testExecReturningDecodableObjectFromJSON() {
         // Given
         var result: TestCodableObject?
         let expectObject: TestCodableObject = TestCodableObject()
         XCTAssertNoThrow(try Shell.expect(command, input: nil, jsonObject: expectObject))
-        
+
         // When
         XCTAssertNoThrow(result = try Shell(command).exec(decoder: JSONDecoder()))
 
@@ -318,15 +325,15 @@ final class ShellTests: XCTestCase {
         XCTAssertEqual(expectObject, result)
         Shell.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
-    
+
     // MARK: Decodable object from property list
-    
+
     func testExecReturningDecodableObjectFromPropertyList() {
         // Given
         var result: TestCodableObject?
         let expectObject: TestCodableObject = TestCodableObject()
         XCTAssertNoThrow(try Shell.expect(command, input: nil, plistObject: expectObject))
-        
+
         // When
         XCTAssertNoThrow(result = try Shell(command).exec(decoder: PropertyListDecoder()))
 
@@ -335,3 +342,4 @@ final class ShellTests: XCTestCase {
         Shell.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
 }
+// swiftlint:enable control_statement

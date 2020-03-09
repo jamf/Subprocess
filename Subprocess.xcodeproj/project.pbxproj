@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6E1195E42416630500534F74 /* Input.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1195E32416630500534F74 /* Input.swift */; };
 		6EDDC6C12410379F00E171C6 /* Subprocess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6A52410378100E171C6 /* Subprocess.swift */; };
 		6EDDC6C22410379F00E171C6 /* SubprocessDependencyBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6A62410378100E171C6 /* SubprocessDependencyBuilder.swift */; };
 		6EDDC6C32410379F00E171C6 /* Shell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDDC6A72410378100E171C6 /* Shell.swift */; };
@@ -44,6 +45,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6E1195E32416630500534F74 /* Input.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Input.swift; sourceTree = "<group>"; };
 		6EDDC6382410369400E171C6 /* Subprocess.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Subprocess.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6EDDC6A22410378100E171C6 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		6EDDC6A52410378100E171C6 /* Subprocess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subprocess.swift; sourceTree = "<group>"; };
@@ -150,6 +152,7 @@
 				6EDDC6A82410378100E171C6 /* Errors.swift */,
 				6EDDC6A92410378100E171C6 /* Subprocess.h */,
 				6EDDC6AA2410378100E171C6 /* Info.plist */,
+				6E1195E32416630500534F74 /* Input.swift */,
 			);
 			path = Subprocess;
 			sourceTree = "<group>";
@@ -232,6 +235,7 @@
 				6EDDC6342410369400E171C6 /* Sources */,
 				6EDDC6352410369400E171C6 /* Frameworks */,
 				6EDDC6362410369400E171C6 /* Resources */,
+				6E1195E124165F1500534F74 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -250,6 +254,7 @@
 				6EDDC6C7241037CE00E171C6 /* Sources */,
 				6EDDC6C8241037CE00E171C6 /* Frameworks */,
 				6EDDC6C9241037CE00E171C6 /* Resources */,
+				6E1195E224165F2000534F74 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -373,11 +378,49 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		6E1195E124165F1500534F74 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+		6E1195E224165F2000534F74 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi \n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		6EDDC6342410369400E171C6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6E1195E42416630500534F74 /* Input.swift in Sources */,
 				6EDDC6C42410379F00E171C6 /* Errors.swift in Sources */,
 				6EDDC6C32410379F00E171C6 /* Shell.swift in Sources */,
 				6EDDC6C22410379F00E171C6 /* SubprocessDependencyBuilder.swift in Sources */,

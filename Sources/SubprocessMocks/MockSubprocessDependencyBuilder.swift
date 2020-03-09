@@ -49,17 +49,17 @@ public enum MockSubprocessError: Error {
 public protocol SubprocessMockObject {}
 
 public extension SubprocessMockObject {
-    
+
     /// Verifies expected stubs and resets mocking
     /// - Throws: A `MockSubprocessError.missedExpectations` containing failed expectations
     static func verify() throws { try MockSubprocessDependencyBuilder.shared.verify() }
-    
+
     /// Verifies expected stubs and resets mocking
     /// - Parameter missedBlock: Block called for each failed expectation
     static func verify(missedBlock: (ExpectationError) -> Void) {
         MockSubprocessDependencyBuilder.shared.verify(missedBlock: missedBlock)
     }
-    
+
     /// Resets mocking
     static func reset() { MockSubprocessDependencyBuilder.shared.reset() }
 }
@@ -77,11 +77,15 @@ class MockSubprocessDependencyBuilder {
     class MockItem {
         var used = false
         var command: [String]
-        var input: Subprocess.Input?
+        var input: Input?
         var process: MockProcessReference
         var file: StaticString?
         var line: UInt?
-        init(command: [String], input: Subprocess.Input?, process: MockProcessReference, file: StaticString?, line: UInt?) {
+        init(command: [String],
+             input: Input?,
+             process: MockProcessReference,
+             file: StaticString?,
+             line: UInt?) {
             self.command = command
             self.input = input
             self.process = process
@@ -89,19 +93,23 @@ class MockSubprocessDependencyBuilder {
             self.line = line
         }
     }
-    
+
     var mocks: [MockItem] = []
 
     static let shared = MockSubprocessDependencyBuilder()
-    
+
     init() { SubprocessDependencyBuilder.shared = self }
-    
+
     func stub(_ command: [String], process: MockProcessReference) {
         let mock = MockItem(command: command, input: nil, process: process, file: nil, line: nil)
         mocks.append(mock)
     }
-    
-    func expect(_ command: [String], input: Subprocess.Input?, process: MockProcessReference, file: StaticString, line: UInt) {
+
+    func expect(_ command: [String],
+                input: Input?,
+                process: MockProcessReference,
+                file: StaticString,
+                line: UInt) {
         let mock = MockItem(command: command, input: input, process: process, file: file, line: line)
         mocks.append(mock)
     }
@@ -112,10 +120,10 @@ class MockSubprocessDependencyBuilder {
         mocks.forEach {
             // Check if the file and line properties were set, this indicates it was an expected mock
             guard let file = $0.file, let line = $0.line else { return }
-            
+
             // Check if the mock was used
             guard $0.used else { return block(ExpectationError(file: file, line: line, message: "Command not called")) }
-            
+
             // Check the expected input
             let expectedData: Data?
             let expectedFile: URL?
@@ -133,49 +141,72 @@ class MockSubprocessDependencyBuilder {
                 expectedData = nil
                 expectedFile = nil
             }
-            
+
             let inputFile: URL? = ($0.process.standardInput as? MockFileHandle)?.url
             let inputData: Data? = ($0.process.standardInput as? MockPipe)?.data
-            
-            if let expectedURL = expectedFile {
-                if let inputURL = inputFile {
-                    if inputURL != expectedURL {
-                        block(ExpectationError(file: file,
-                                               line: line,
-                                               message: "Input file URLs do not match \(expectedURL) != \(inputURL)"))
-                    }
-                } else {
-                    block(ExpectationError(file: file, line: line, message: "Missing file input"))
-                }
-            } else if let unexpectedInputURL = inputFile {
-                block(ExpectationError(file: file, line: line, message: "Unexpected input file \(unexpectedInputURL)"))
-            } else if let expectedData = expectedData {
-                if let inputData = inputData {
-                    if inputData != expectedData {
-                        if let input = String(data: inputData, encoding: .utf8),
-                            let expected = String(data: inputData, encoding: .utf8) {
-                            block(ExpectationError(file: file,
-                                                   line: line,
-                                                   message: "Input text does not match expected input text \(input) != \(expected)"))
-                        } else {
-                            block(ExpectationError(file: file,
-                                                   line: line,
-                                                   message: "Input data does not match expected input data"))
-                        }
-                    }
-                } else {
-                    block(ExpectationError(file: file, line: line, message: "Missing data input"))
-                }
-            } else if let unexpectedData = inputData {
-                if let input = String(data: unexpectedData, encoding: .utf8){
-                    block(ExpectationError(file: file, line: line, message: "Unexpected input text: \(input)"))
-                } else {
-                    block(ExpectationError(file: file, line: line, message: "Unexpected input data"))
-                }
-            }
-            
+
+            let fileError = verifyInputFile(inputURL: inputFile, expectedURL: expectedFile, file: file, line: line)
+            if let error = fileError { return block(error) }
+
+            let dataError = verifyInputData(inputData: inputData, expectedData: expectedData, file: file, line: line)
+            guard let error = dataError else { return }
+            block(error)
         }
     }
+
+    private func verifyInputFile(inputURL: URL?,
+                                 expectedURL: URL?,
+                                 file: StaticString,
+                                 line: UInt) -> ExpectationError? {
+        if let expected = expectedURL {
+            if let url = inputURL {
+                if expected != url {
+                    return ExpectationError(file: file,
+                                            line: line,
+                                            message: "Input file URLs do not match \(expected) != \(url)")
+                }
+            } else {
+                return ExpectationError(file: file, line: line, message: "Missing file input")
+            }
+        } else if let url = inputURL {
+            return ExpectationError(file: file, line: line, message: "Unexpected input file \(url)")
+        }
+        return nil
+    }
+
+    private func verifyInputData(inputData: Data?,
+                                 expectedData: Data?,
+                                 file: StaticString,
+                                 line: UInt) -> ExpectationError? {
+        if let expectedData = expectedData {
+            if let inputData = inputData {
+                if inputData != expectedData {
+                    if let input = String(data: inputData, encoding: .utf8),
+                        let expected = String(data: inputData, encoding: .utf8) {
+                        let errorText = "Input text does not match expected input text \(input) != \(expected)"
+                        return ExpectationError(file: file,
+                                                line: line,
+                                                message: errorText)
+                    } else {
+                        return ExpectationError(file: file,
+                                                line: line,
+                                                message: "Input data does not match expected input data")
+                    }
+                }
+            } else {
+                return ExpectationError(file: file, line: line, message: "Missing data input")
+            }
+        } else if let unexpectedData = inputData {
+            if let input = String(data: unexpectedData, encoding: .utf8) {
+                return ExpectationError(file: file, line: line, message: "Unexpected input text: \(input)")
+            } else {
+                return ExpectationError(file: file, line: line, message: "Unexpected input data")
+            }
+        }
+        return nil
+    }
+
+    //private func
 
     func verify() throws {
         var errors: [ExpectationError] = []
@@ -197,13 +228,13 @@ extension MockSubprocessDependencyBuilder: SubprocessDependencyFactory {
         }
         return MockProcessReference(withRunError: MockSubprocessError.missingMock(command))
     }
-    
+
     func createInputFileHandle(for url: URL) throws -> FileHandle {
         let handle = MockFileHandle()
         handle.url = url
         return handle
     }
-    
+
     func createInputPipe(for data: Data) -> Pipe {
         let pipe = MockPipe()
         pipe.data = data

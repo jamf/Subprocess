@@ -28,10 +28,10 @@
 import Foundation
 import Subprocess
 
-extension Shell: SubprocessMockObject  {}
+extension Shell: SubprocessMockObject {}
 
 public extension Shell {
-    
+
     /// Adds a mock for a command which throws an error when `Process.run` is called
     ///
     /// - Parameters:
@@ -40,7 +40,7 @@ public extension Shell {
     static func stub(_ command: [String], error: Error) {
         Subprocess.stub(command, error: error)
     }
-    
+
     /// Adds a mock for a command which writes the given data to the outputs and exits with the provided exit code
     ///
     /// - Parameters:
@@ -62,7 +62,7 @@ public extension Shell {
             process.exit(withStatus: exitCode)
         }
     }
-    
+
     /// Adds a mock for a command which writes the given text to the outputs and exits with the provided exit code
     ///
     /// - Parameters:
@@ -82,7 +82,7 @@ public extension Shell {
             process.exit(withStatus: exitCode)
         }
     }
-    
+
     /// Adds a mock for a command which writes the given text to stderr and exits with the provided exit code
     ///
     /// - Parameters:
@@ -98,7 +98,7 @@ public extension Shell {
             process.exit(withStatus: exitCode)
         }
     }
-    
+
     /// Adds a mock for a command which writes the given property list to stdout and exits with the provided exit code
     ///
     /// - Parameters:
@@ -126,8 +126,9 @@ public extension Shell {
         let data = try JSONSerialization.data(withJSONObject: json, options: [])
         Shell.stub(command, standardOutput: data, exitCode: exitCode)
     }
-    
-    /// Adds a mock for a command which writes the given encodable object as a property list to stdout and exits with the provided exit code
+
+    /// Adds a mock for a command which writes the given encodable object as a property list to stdout
+    /// and exits with the provided exit code
     ///
     /// - Parameters:
     ///     - command: The command to mock
@@ -140,8 +141,9 @@ public extension Shell {
         let data = try PropertyListEncoder().encode(plistObject)
         Shell.stub(command, standardOutput: data, exitCode: exitCode)
     }
-    
-    /// Adds a mock for a command which writes the given encodable object as JSON to stdout and exits with the provided exit code
+
+    /// Adds a mock for a command which writes the given encodable object as JSON to stdout
+    /// and exits with the provided exit code
     ///
     /// - Parameters:
     ///     - command: The command to mock
@@ -156,7 +158,7 @@ public extension Shell {
     }
 
     // MARK: -
-    
+
     /// Adds an expected mock for a command which throws an error when `Process.run` is called
     ///
     /// - Parameters:
@@ -172,8 +174,9 @@ public extension Shell {
                        line: UInt = #line) {
         Subprocess.expect(command, input: input, error: error, file: file, line: line)
     }
-    
-    /// Adds an expected mock for a command which writes the given data to the outputs and exits with the provided exit code
+
+    /// Adds an expected mock for a command which writes the given data to the outputs
+    /// and exits with the provided exit code
     ///
     /// - Parameters:
     ///     - command: The command to mock
@@ -200,8 +203,9 @@ public extension Shell {
             process.exit(withStatus: exitCode)
         }
     }
-    
-    /// Adds an expected mock for a command which writes the given text to the outputs and exits with the provided exit code
+
+    /// Adds an expected mock for a command which writes the given text to the outputs
+    /// and exits with the provided exit code
     ///
     /// - Parameters:
     ///     - command: The command to mock
@@ -226,7 +230,7 @@ public extension Shell {
             process.exit(withStatus: exitCode)
         }
     }
-    
+
     /// Adds an expected mock for a command which writes the given text to stderr and exits with the provided exit code
     ///
     /// - Parameters:
@@ -248,8 +252,9 @@ public extension Shell {
             process.exit(withStatus: exitCode)
         }
     }
-    
-    /// Adds an expected mock for a command which writes the given property list to stdout and exits with the provided exit code
+
+    /// Adds an expected mock for a command which writes the given property list to stdout
+    /// and exits with the provided exit code
     ///
     /// - Parameters:
     ///     - command: The command to mock
@@ -268,8 +273,9 @@ public extension Shell {
         let data = try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
         Shell.expect(command, input: input, standardOutput: data, exitCode: exitCode, file: file, line: line)
     }
-    
-    /// Adds an expected mock for a command which writes the given JSON object to stdout and exits with the provided exit code
+
+    /// Adds an expected mock for a command which writes the given JSON object to stdout
+    /// and exits with the provided exit code
     ///
     /// - Parameters:
     ///     - command: The command to mock
@@ -288,8 +294,9 @@ public extension Shell {
         let data = try JSONSerialization.data(withJSONObject: json, options: [])
         Shell.expect(command, input: input, standardOutput: data, exitCode: exitCode, file: file, line: line)
     }
-    
-    /// Adds an expected mock for a command which writes the given encodable object as a property list to stdout and exits with the provided exit code
+
+    /// Adds an expected mock for a command which writes the given encodable object as a property list to stdout
+    /// and exits with the provided exit code
     ///
     /// - Parameters:
     ///     - command: The command to mock
@@ -309,7 +316,8 @@ public extension Shell {
         Shell.expect(command, input: input, standardOutput: data, exitCode: exitCode, file: file, line: line)
     }
 
-    /// Adds an expected mock for a command which writes the given encodable object as JSON to stdout and exits with the provided exit code
+    /// Adds an expected mock for a command which writes the given encodable object as JSON to stdout
+    /// and exits with the provided exit code
     ///
     /// - Parameters:
     ///     - command: The command to mock

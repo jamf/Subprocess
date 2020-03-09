@@ -29,19 +29,19 @@ import Foundation
 
 /// Type representing possible errors
 public enum SubprocessError: Error {
-    
+
     /// The process completed with a none-zero exit code
     case exitedWithNoneZeroStatus(Int32)
-    
+
     /// The property list object could not be casted into expected type
     case unexpectedPropertyListObject(String)
-    
+
     /// The JSON object could not be casted into expected type
     case unexpectedJSONObject(String)
-    
+
     /// Input string could not be encoded
     case inputStringEncodingError
-    
+
     /// Output string could not be encoded
     case outputStringEncodingError
 }
