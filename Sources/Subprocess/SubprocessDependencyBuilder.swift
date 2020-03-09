@@ -52,6 +52,7 @@ public protocol SubprocessDependencyFactory {
 /// Default implementation of SubprocessDependencyFactory
 public struct SubprocessDependencyBuilder: SubprocessDependencyFactory {
 
+    /// Shared instance used for dependency creatation
     public static var shared: SubprocessDependencyFactory = SubprocessDependencyBuilder()
 
     public func createProcess(for command: [String]) -> Process {

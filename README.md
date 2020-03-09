@@ -15,6 +15,8 @@
     - [SwiftPM](#swiftpm)
     - [Cocoapods](#cocoapods)
     - [Carthage](#carthage)
+		
+[Full Documentation](https://github.com/jamf/Subprocess/docs/index.html)
 
 # Usage
 ### Shell Class
