@@ -5,6 +5,7 @@
 [![Language](http://img.shields.io/badge/language-Swift-lightgrey.svg?style=flat)](https://developer.apple.com/swift)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![SwiftPM compatible](https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=flat)](https://swift.org/package-manager)
+[![Documentation](docs/badge.svg)](./docs/index.html)
 
 - [Usage](#usage)
     - [Shell](#shell-class)
@@ -16,7 +17,7 @@
     - [Cocoapods](#cocoapods)
     - [Carthage](#carthage)
 		
-[Full Documentation](https://github.com/jamf/Subprocess/docs/index.html)
+[Full Documentation](./docs/index.html)
 
 # Usage
 ### Shell Class
