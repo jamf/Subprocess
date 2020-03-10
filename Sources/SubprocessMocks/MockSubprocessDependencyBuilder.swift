@@ -206,8 +206,6 @@ class MockSubprocessDependencyBuilder {
         return nil
     }
 
-    //private func
-
     func verify() throws {
         var errors: [ExpectationError] = []
         verify { errors.append($0) }
