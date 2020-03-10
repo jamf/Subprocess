@@ -22,7 +22,7 @@ final class SubprocessTests: XCTestCase {
         var pipeOrFileHandle: Any?
         let expected = Data([ UInt8.random(in: 0...UInt8.max),
                               UInt8.random(in: 0...UInt8.max),
-                              UInt8.random(in: 0...UInt8.max)  ])
+                              UInt8.random(in: 0...UInt8.max) ])
 
         // When
         let input = Input.data(expected)
@@ -125,10 +125,10 @@ final class SubprocessTests: XCTestCase {
         let expectedExitCode = Int32.random(in: Int32.min...Int32.max)
         let expectedStdout = Data([ UInt8.random(in: 0...UInt8.max),
                                     UInt8.random(in: 0...UInt8.max),
-                                    UInt8.random(in: 0...UInt8.max)  ])
+                                    UInt8.random(in: 0...UInt8.max) ])
         let expectedStderr = Data([ UInt8.random(in: 0...UInt8.max),
                                     UInt8.random(in: 0...UInt8.max),
-                                    UInt8.random(in: 0...UInt8.max)  ])
+                                    UInt8.random(in: 0...UInt8.max) ])
         Subprocess.expect(command) { mock in
             mock.writeTo(stdout: expectedStdout)
             mock.writeTo(stderr: expectedStderr)

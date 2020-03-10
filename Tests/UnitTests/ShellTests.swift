@@ -10,7 +10,7 @@ struct TestCodableObject: Codable, Equatable {
 // swiftlint:disable control_statement
 final class ShellTests: XCTestCase {
 
-    let command = [ "/usr/local/bin/somefakeCommand", "foo", "bar"  ]
+    let command = [ "/usr/local/bin/somefakeCommand", "foo", "bar" ]
 
     override func setUp() {
         // This is only needed for SwiftPM since it runs all of the test suites as a single test run

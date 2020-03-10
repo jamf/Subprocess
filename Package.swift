@@ -1,5 +1,4 @@
 // swift-tools-version:5.1
-// The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
@@ -10,7 +9,6 @@ let package = Package(
         .library(name: "Subprocess", targets: [ "Subprocess" ]),
         .library(name: "SubprocessMocks", targets: [ "SubprocessMocks" ])
     ],
-    dependencies: [],
     targets: [
         .target( name: "Subprocess", dependencies: []),
         .target( name: "SubprocessMocks", dependencies: [ "Subprocess" ]),
