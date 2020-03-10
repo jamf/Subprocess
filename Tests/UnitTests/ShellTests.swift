@@ -31,7 +31,7 @@ final class ShellTests: XCTestCase {
         // When
         XCTAssertThrowsError(_ = try Shell(command).exec()) {
             switch ($0 as? SubprocessError) {
-            case .exitedWithNoneZeroStatus(let status):
+            case .exitedWithNonZeroStatus(let status):
                 XCTAssertEqual(status, exitCode)
             default: XCTFail("Unexpected error type: \($0)")
             }
@@ -105,7 +105,7 @@ final class ShellTests: XCTestCase {
         // When
         XCTAssertThrowsError(_ = try Shell(command).exec(encoding: .utf8)) {
             switch ($0 as? SubprocessError) {
-            case .exitedWithNoneZeroStatus(let status):
+            case .exitedWithNonZeroStatus(let status):
                 XCTAssertEqual(status, exitCode)
             default: XCTFail("Unexpected error type: \($0)")
             }
