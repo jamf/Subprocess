@@ -84,7 +84,7 @@ public class Shell {
     public func exec(input: Input? = nil, options: OutputOptions = .stdout) throws -> Data {
         return try exec(input: input, options: options) { process, data in
             let exitCode = process.exitCode
-            guard exitCode == 0 else { throw SubprocessError.exitedWithNoneZeroStatus(exitCode) }
+            guard exitCode == 0 else { throw SubprocessError.exitedWithNonZeroStatus(exitCode) }
             return data
         }
     }
@@ -124,7 +124,7 @@ public class Shell {
                      encoding: String.Encoding) throws -> String {
         return try exec(input: input, options: options, encoding: encoding) { process, text in
             let exitCode = process.exitCode
-            guard exitCode == 0 else { throw SubprocessError.exitedWithNoneZeroStatus(exitCode) }
+            guard exitCode == 0 else { throw SubprocessError.exitedWithNonZeroStatus(exitCode) }
             return text
         }
     }
