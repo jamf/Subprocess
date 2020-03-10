@@ -30,8 +30,8 @@ import Foundation
 /// Type representing possible errors
 public enum SubprocessError: Error {
 
-    /// The process completed with a none-zero exit code
-    case exitedWithNoneZeroStatus(Int32)
+    /// The process completed with a non-zero exit code
+    case exitedWithNonZeroStatus(Int32)
 
     /// The property list object could not be casted into expected type
     case unexpectedPropertyListObject(String)
