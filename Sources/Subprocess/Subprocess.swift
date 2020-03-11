@@ -49,7 +49,7 @@ open class Subprocess {
     ///
     /// - Parameter command: Command represented as an array of strings
     public init(_ command: [String], qos: DispatchQoS = .default) {
-        reference = SubprocessDependencyBuilder.shared.createProcess(for: command)
+        reference = SubprocessDependencyBuilder.shared.makeProcess(command: command)
         queue = DispatchQueue(label: "SubprocessQueue",
                               qos: qos,
                               attributes: [],

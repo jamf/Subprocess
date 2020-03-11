@@ -219,7 +219,7 @@ class MockSubprocessDependencyBuilder {
 }
 
 extension MockSubprocessDependencyBuilder: SubprocessDependencyFactory {
-    func createProcess(for command: [String]) -> Process {
+    func makeProcess(command: [String]) -> Process {
         if let item = mocks.first(where: { !$0.used && $0.command == command }) {
             item.used = true
             return item.process
@@ -227,13 +227,13 @@ extension MockSubprocessDependencyBuilder: SubprocessDependencyFactory {
         return MockProcessReference(withRunError: MockSubprocessError.missingMock(command))
     }
 
-    func createInputFileHandle(for url: URL) throws -> FileHandle {
+    func makeInputFileHandle(url: URL) throws -> FileHandle {
         let handle = MockFileHandle()
         handle.url = url
         return handle
     }
 
-    func createInputPipe(for data: Data) -> Pipe {
+    func makeInputPipe(data: Data) -> Pipe {
         let pipe = MockPipe()
         pipe.data = data
         return pipe

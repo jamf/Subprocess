@@ -78,12 +78,12 @@ public struct Input {
     func createPipeOrFileHandle() throws -> Any {
         switch value {
         case .data(let data):
-            return SubprocessDependencyBuilder.shared.createInputPipe(for: data)
+            return SubprocessDependencyBuilder.shared.makeInputPipe(data: data)
         case .text(let text, let encoding):
             guard let data = text.data(using: encoding) else { throw SubprocessError.inputStringEncodingError }
-            return SubprocessDependencyBuilder.shared.createInputPipe(for: data)
+            return SubprocessDependencyBuilder.shared.makeInputPipe(data: data)
         case .file(let url):
-            return try SubprocessDependencyBuilder.shared.createInputFileHandle(for: url)
+            return try SubprocessDependencyBuilder.shared.makeInputFileHandle(url: url)
         }
     }
 }
