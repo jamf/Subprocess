@@ -26,7 +26,7 @@
 //
 import Foundation
 
-/// Interface representing into to the process
+/// Interface representing input to the process
 public struct Input {
 
     /// Reference to the input value
