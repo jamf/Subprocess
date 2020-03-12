@@ -7,7 +7,7 @@
 [![SwiftPM compatible](https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=flat)](https://swift.org/package-manager)
 [![Documentation](docs/badge.svg)](./docs/index.html)
 
-Subprocess is a Swift library for easy process execution providing interfaces for both synchronous and asynchronous process execution. 
+Subprocess is a Swift library for macOS providing interfaces for both synchronous and asynchronous process execution. 
 SubprocessMocks can be used in unit tests for quick and highly customizable mocking and verification of Subprocess usage. 
 
 - [Usage](#usage)
