@@ -14,6 +14,8 @@ Pod::Spec.new do |s|
   s.swift_version = '5.1'
   s.default_subspec = 'Core'
 
+  s.pod_target_xcconfig = { 'OTHER_SWIFT_FLAGS' => '-DCOCOA_PODS' }
+  
   s.subspec 'Core' do |ss|
     ss.source_files = 'Sources/Subprocess/*.swift'
   end
