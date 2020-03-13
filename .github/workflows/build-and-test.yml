@@ -21,4 +21,10 @@ jobs:
       run: xcodebuild build -scheme 'SubprocessMocks' -derivedDataPath .build
     - name: Run tests
       run: xcodebuild test -scheme 'Subprocess' -derivedDataPath .build
-
+  cocoapods:
+    name: Pod lib lint
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Lib lint
+      run: pod lib lint --verbose Subprocess.podspec
