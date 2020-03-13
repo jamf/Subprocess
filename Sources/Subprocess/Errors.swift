@@ -33,10 +33,10 @@ public enum SubprocessError: Error {
     /// The process completed with a non-zero exit code
     case exitedWithNonZeroStatus(Int32)
 
-    /// The property list object could not be casted into expected type
+    /// The property list object could not be cast to expected type
     case unexpectedPropertyListObject(String)
 
-    /// The JSON object could not be casted into expected type
+    /// The JSON object could not be cast to expected type
     case unexpectedJSONObject(String)
 
     /// Input string could not be encoded
