@@ -1,8 +1,9 @@
 # Subprocess
 ![Build](https://github.com/jamf/Subprocess/workflows/Build%20&%20Test/badge.svg)
+[![CocoaPods](https://img.shields.io/cocoapods/v/Subprocess.svg)](https://cocoapods.org/pods/Subprocess)
 [![License](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](http://mit-license.org)
-[![Platform](https://img.shields.io/badge/platform-macOS-lightgrey.svg?style=flat)](https://developer.apple.com/macos)
-[![Language](http://img.shields.io/badge/language-Swift-lightgrey.svg?style=flat)](https://developer.apple.com/swift)
+[![Platform](https://img.shields.io/badge/platform-macOS-brightgreen.svg?style=flat)](https://developer.apple.com/macos)
+[![Language](http://img.shields.io/badge/language-Swift-brightgreen.svg?style=flat)](https://developer.apple.com/swift)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![SwiftPM compatible](https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=flat)](https://swift.org/package-manager)
 [![Documentation](docs/badge.svg)](./docs/index.html)
