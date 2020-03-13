@@ -26,7 +26,9 @@
 //
 
 import Foundation
+#if !COCOA_PODS
 import Subprocess
+#endif
 
 /// Interface used for mocking a process
 public struct MockProcess {

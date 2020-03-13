@@ -26,7 +26,9 @@
 //
 
 import Foundation
+#if !COCOA_PODS
 import Subprocess
+#endif
 
 extension Subprocess: SubprocessMockObject {}
 

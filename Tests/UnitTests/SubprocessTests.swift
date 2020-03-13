@@ -1,6 +1,8 @@
 import XCTest
 @testable import Subprocess
+#if !COCOA_PODS
 @testable import SubprocessMocks
+#endif
 
 final class SubprocessTests: XCTestCase {
 

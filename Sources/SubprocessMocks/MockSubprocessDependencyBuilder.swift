@@ -26,7 +26,9 @@
 //
 
 import Foundation
+#if !COCOA_PODS
 import Subprocess
+#endif
 
 /// Error representing a failed call to Subprocess.expect or Shell.expect
 public struct ExpectationError: Error {
