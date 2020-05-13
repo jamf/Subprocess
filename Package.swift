@@ -17,12 +17,12 @@ let package = Package(
             targets: [ "SubprocessMocks" ]
         ),
         .library(
-            name: "SubprocessDylib",
+            name: "libSubprocess",
             type: .dynamic,
             targets: [ "Subprocess" ]
         ),
         .library(
-            name: "SubprocessMocksDylib",
+            name: "libSubprocessMocks",
             type: .dynamic,
             targets: [ "SubprocessMocks" ]
         )
