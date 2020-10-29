@@ -31,7 +31,8 @@ import Foundation
 public enum SubprocessError: Error {
 
     /// The process completed with a non-zero exit code
-    case exitedWithNonZeroStatus(Int32)
+    /// and a custom error message.
+    case exitedWithNonZeroStatus(Int32, String)
 
     /// The property list object could not be cast to expected type
     case unexpectedPropertyListObject(String)
@@ -44,4 +45,35 @@ public enum SubprocessError: Error {
 
     /// Output string could not be encoded
     case outputStringEncodingError
+}
+
+extension SubprocessError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .exitedWithNonZeroStatus(_, let errorMessage):
+            return "\(errorMessage)"
+        case .unexpectedPropertyListObject:
+            return "The property list object could not be cast to expected type"
+        case .unexpectedJSONObject:
+            return "The JSON object could not be cast to expected type"
+        case .inputStringEncodingError:
+            return "Input string could not be encoded"
+        case .outputStringEncodingError:
+            return "Output string could not be encoded"
+        }
+    }
+}
+
+/// Gets us the NSError methods for when used by Objective-C
+extension SubprocessError: CustomNSError {
+    public var errorCode: Int {
+        switch self {
+        case .exitedWithNonZeroStatus(let errorCode, _):
+            return Int(errorCode)
+        case .unexpectedPropertyListObject: return 10
+        case .unexpectedJSONObject: return 20
+        case .inputStringEncodingError: return 30
+        case .outputStringEncodingError: return 40
+        }
+    }
 }
