@@ -64,7 +64,7 @@ extension SubprocessError: LocalizedError {
     }
 }
 
-/// Gets us the NSError methods for when used by Objective-C
+/// Common NSError methods for better interop with Objective-C
 extension SubprocessError: CustomNSError {
     public var errorCode: Int {
         switch self {
