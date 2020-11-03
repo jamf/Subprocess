@@ -52,9 +52,11 @@ extension SubprocessError: LocalizedError {
         switch self {
         case .exitedWithNonZeroStatus(_, let errorMessage):
             return "\(errorMessage)"
-        case .unexpectedPropertyListObject:
+        case .unexpectedPropertyListObject(_):
+            // Ignoring the plist contents parameter as we don't want that in the error message
             return "The property list object could not be cast to expected type"
-        case .unexpectedJSONObject:
+        case .unexpectedJSONObject(_):
+            // Ignoring the json contents parameter as we don't want that in the error message
             return "The JSON object could not be cast to expected type"
         case .inputStringEncodingError:
             return "Input string could not be encoded"
