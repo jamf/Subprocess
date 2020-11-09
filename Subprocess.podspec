@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'Subprocess'
-  s.version      = '1.0.1'
+  s.version      = '2.0.0'
   s.summary      = 'Wrapper for NSTask used for running processes and shell commands on macOS.'
   s.license      = { :type => 'MIT', :text => "" }
   s.description  = <<-DESC

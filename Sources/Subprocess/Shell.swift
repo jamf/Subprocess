@@ -66,12 +66,17 @@ public class Shell {
     public func exec<T>(input: Input? = nil,
                         options: OutputOptions = .stdout,
                         transformBlock: (_ process: Subprocess, _ data: Data) throws -> T) throws -> T {
-        var buffer = Data()
+        var stdoutBuffer = Data()
+        var stderrBuffer = Data()
         try process.launch(input: input,
-                           outputHandler: options.contains(.stdout) ? { buffer.append($0) } : nil,
-                           errorHandler: options.contains(.stderr) ? { buffer.append($0) } : nil)
+                           outputHandler: options.contains(.stdout) ? { stdoutBuffer.append($0) } : nil,
+                           errorHandler: options.contains(.stderr) ? { stderrBuffer.append($0) } : nil)
         process.waitForTermination()
-        return try transformBlock(process, buffer)
+        // doing this so we can consistently get stdout before stderr when using the combined option
+        var combinedBuffer = Data()
+        combinedBuffer.append(stdoutBuffer)
+        combinedBuffer.append(stderrBuffer)
+        return try transformBlock(process, combinedBuffer)
     }
 
     /// Executes shell command expecting exit code of zero and returning the output data
@@ -84,7 +89,10 @@ public class Shell {
     public func exec(input: Input? = nil, options: OutputOptions = .stdout) throws -> Data {
         return try exec(input: input, options: options) { process, data in
             let exitCode = process.exitCode
-            guard exitCode == 0 else { throw SubprocessError.exitedWithNonZeroStatus(exitCode) }
+            guard exitCode == 0 else {
+                let message = String(data: data, encoding: .utf8)
+                throw SubprocessError.exitedWithNonZeroStatus(exitCode, message ?? "")
+            }
             return data
         }
     }
@@ -124,7 +132,9 @@ public class Shell {
                      encoding: String.Encoding) throws -> String {
         return try exec(input: input, options: options, encoding: encoding) { process, text in
             let exitCode = process.exitCode
-            guard exitCode == 0 else { throw SubprocessError.exitedWithNonZeroStatus(exitCode) }
+            guard exitCode == 0 else {
+                throw SubprocessError.exitedWithNonZeroStatus(exitCode, text)
+            }
             return text
         }
     }

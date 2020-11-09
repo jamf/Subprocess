@@ -1,7 +1,7 @@
 import XCTest
 @testable import Subprocess
 
-final class ShellTests: XCTestCase {
+final class ShellSystemTests: XCTestCase {
 
     override func setUp() {
         SubprocessDependencyBuilder.shared = SubprocessDependencyBuilder()

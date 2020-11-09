@@ -28,14 +28,21 @@ final class ShellTests: XCTestCase {
     func testExecReturningDataWhenExitCodeIsNoneZero() {
         // Given
         let exitCode = Int32.random(in: 1...Int32.max)
-        Shell.expect(command, input: nil, standardError: Data(), exitCode: exitCode)
+        let stdoutData = "stdout example".data(using: .utf8)
+        let stderrData = "stderr example".data(using: .utf8)
+        Shell.expect(command, input: nil, standardOutput: stdoutData, standardError: stderrData, exitCode: exitCode)
 
         // When
-        XCTAssertThrowsError(_ = try Shell(command).exec()) {
-            switch ($0 as? SubprocessError) {
-            case .exitedWithNonZeroStatus(let status):
+        XCTAssertThrowsError(_ = try Shell(command).exec()) { error in
+            switch (error as? SubprocessError) {
+            case .exitedWithNonZeroStatus(let status, let errorMessage):
                 XCTAssertEqual(status, exitCode)
-            default: XCTFail("Unexpected error type: \($0)")
+                let failMsg = "error message should have contained the results from only stdout but was \(errorMessage)"
+                XCTAssertTrue(errorMessage.contains("stdout example"), failMsg)
+                XCTAssertEqual(errorMessage, error.localizedDescription, "should have also set localizedDescription")
+                let nsError = error as NSError
+                XCTAssertEqual(Int(status), nsError.code, "should have also set the NSError exit code")
+            default: XCTFail("Unexpected error type: \(error)")
             }
         }
 
@@ -92,8 +99,7 @@ final class ShellTests: XCTestCase {
 
         // Then
         let text = String(data: result, encoding: .utf8)
-        XCTAssertTrue(text?.contains(expectedStdout) ?? false)
-        XCTAssertTrue(text?.contains(expectedStderr) ?? false)
+        XCTAssertEqual("\(expectedStdout)\(expectedStderr)", text, "should have combined stdout and stderror")
         Shell.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
 
@@ -102,14 +108,18 @@ final class ShellTests: XCTestCase {
     func testExecReturningStringWhenExitCodeIsNoneZero() {
         // Given
         let exitCode = Int32.random(in: 1...Int32.max)
-        Shell.expect(command, input: nil, stderr: "Some error occured", exitCode: exitCode)
-
+        let stdoutText = "should not show up"
+        let stderrText = "should show up"
+        Shell.expect(command, input: nil, stdout: stdoutText, stderr: stderrText, exitCode: exitCode)
         // When
-        XCTAssertThrowsError(_ = try Shell(command).exec(encoding: .utf8)) {
-            switch ($0 as? SubprocessError) {
-            case .exitedWithNonZeroStatus(let status):
+        XCTAssertThrowsError(_ = try Shell(command).exec(options: .stderr, encoding: .utf8)) { error in
+            switch (error as? SubprocessError) {
+            case .exitedWithNonZeroStatus(let status, let errorMessage):
                 XCTAssertEqual(status, exitCode)
-            default: XCTFail("Unexpected error type: \($0)")
+                let failMsg = "should have put just stderr in the error: \(errorMessage)"
+                XCTAssertEqual("should show up", errorMessage, failMsg)
+                XCTAssertEqual(errorMessage, error.localizedDescription, "also should have set localizedDescription")
+            default: XCTFail("Unexpected error type: \(error)")
             }
         }
 
