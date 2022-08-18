@@ -194,7 +194,7 @@ open class MockProcessReference: Process {
         set { context.standardError = newValue }
     }
 
-    open override var terminationHandler: (@Sendable(Process) -> Void)? {
+    open override var terminationHandler: (@Sendable (Process) -> Void)? {
         get { context.terminationHandler }
         set { context.terminationHandler = newValue }
     }
