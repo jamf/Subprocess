@@ -95,7 +95,7 @@ open class MockProcessReference: Process {
         var standardInput: Any?
         var standardOutput: Any?
         var standardError: Any?
-        var terminationHandler: ((Process) -> Void)?
+        var terminationHandler: (@Sendable (Process) -> Void)?
     }
     // swiftlint:enable nesting
 
