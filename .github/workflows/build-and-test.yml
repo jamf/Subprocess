@@ -5,7 +5,7 @@ on: [push]
 jobs:
   spm:
     name: SwiftPM build and test
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
     - uses: actions/checkout@v2
     - name: Build swift packages
@@ -14,7 +14,7 @@ jobs:
       run: swift test -v
   carthage:
     name: Xcode project build and test
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
     - uses: actions/checkout@v2
     - name: Build xcode project
@@ -23,7 +23,7 @@ jobs:
       run: xcodebuild test -scheme 'Subprocess' -derivedDataPath .build
   cocoapods:
     name: Pod lib lint
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
     - uses: actions/checkout@v2
     - name: Lib lint
