@@ -16,10 +16,6 @@ jobs:
     name: Xcode project build and test
     runs-on: macos-latest
     steps:
-    - name: Xcode Select
-      uses: devbotsxyz/xcode-select@v1.1.0
-      with:
-        beta: true
     - uses: actions/checkout@v2
     - name: Build xcode project
       run: xcodebuild build -scheme 'SubprocessMocks' -derivedDataPath .build
