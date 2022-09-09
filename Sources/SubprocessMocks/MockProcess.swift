@@ -95,7 +95,11 @@ open class MockProcessReference: Process {
         var standardInput: Any?
         var standardOutput: Any?
         var standardError: Any?
+#if compiler(>=5.7)
+        var terminationHandler: (@Sendable (Process) -> Void)?
+#else
         var terminationHandler: ((Process) -> Void)?
+#endif
     }
     // swiftlint:enable nesting
 
@@ -194,10 +198,17 @@ open class MockProcessReference: Process {
         set { context.standardError = newValue }
     }
 
+#if compiler(>=5.7)
+    open override var terminationHandler: (@Sendable (Process) -> Void)? {
+        get { context.terminationHandler }
+        set { context.terminationHandler = newValue }
+    }
+#else
     open override var terminationHandler: ((Process) -> Void)? {
         get { context.terminationHandler }
         set { context.terminationHandler = newValue }
     }
+#endif
 
     open override func resume() -> Bool { stubResume?() ?? false }
 
