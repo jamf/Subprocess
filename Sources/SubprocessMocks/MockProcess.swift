@@ -136,6 +136,17 @@ open class MockProcessReference: Process {
     /// standardError object as a Pipe
     public var standardErrorPipe: Pipe? { standardError as? Pipe }
 
+    /// Environment property
+    private var _environment: [String: String]?
+    open override var environment: [String: String]? {
+        get {
+            return _environment
+        }
+        set {
+            _environment = newValue
+        }
+    }
+
     /// Completes the mock process execution
     /// - Parameters:
     ///     - statusCode: Exit code of the process (Default: 0)

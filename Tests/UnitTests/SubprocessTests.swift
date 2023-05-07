@@ -226,4 +226,18 @@ final class SubprocessTests: XCTestCase {
         waitForExpectations(timeout: 5.0)
         Subprocess.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
+
+    func testEnvironmentProperty() {
+        // Given
+        let subprocess = Subprocess(["/bin/echo"])
+        let environmentVariableName = "FOO"
+        let environmentVariableValue = "BAR"
+
+        // When
+        subprocess.environment = [environmentVariableName: environmentVariableValue]
+
+        // Then
+        XCTAssertEqual(subprocess.environment?[environmentVariableName], environmentVariableValue,
+                       "The environment property did not store the value correctly.")
+    }
 }
