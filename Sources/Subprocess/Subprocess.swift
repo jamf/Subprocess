@@ -45,6 +45,16 @@ open class Subprocess {
     /// Reason for process termination
     public var terminationReason: Process.TerminationReason { reference.terminationReason }
 
+    /// Reference environment property
+    public var environment: [String: String]? {
+        get {
+            reference.environment
+        }
+        set {
+            reference.environment = newValue
+        }
+    }
+
     /// Creates new Subprocess
     ///
     /// - Parameter command: Command represented as an array of strings
