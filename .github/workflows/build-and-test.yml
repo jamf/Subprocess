@@ -1,13 +1,21 @@
 name: Build & Test
 
-on: [push]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 
 jobs:
   spm:
     name: SwiftPM build and test
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Build swift packages
       run: swift build -v
     - name: Run tests
@@ -16,7 +24,7 @@ jobs:
     name: Xcode project build and test
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Build xcode project
       run: xcodebuild build -scheme 'SubprocessMocks' -derivedDataPath .build
     - name: Run tests
@@ -25,6 +33,6 @@ jobs:
     name: Pod lib lint
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Lib lint
       run: pod lib lint --verbose Subprocess.podspec
