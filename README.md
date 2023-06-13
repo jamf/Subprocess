@@ -6,7 +6,7 @@
 [![Language](http://img.shields.io/badge/language-Swift-success.svg?style=flat)](https://developer.apple.com/swift)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![SwiftPM compatible](https://img.shields.io/badge/spm-compatible-success.svg?style=flat)](https://swift.org/package-manager)
-[![Documentation](docs/badge.svg)](https://engineering.jamf.com/Subprocess/documentation/subprocess/)
+[![Documentation](https://img.shields.io/badge/documentation-100%25-green)](https://engineering.jamf.com/Subprocess/documentation/subprocess/)
 
 Subprocess is a Swift library for macOS providing interfaces for both synchronous and asynchronous process execution. 
 SubprocessMocks can be used in unit tests for quick and highly customizable mocking and verification of Subprocess usage. 
