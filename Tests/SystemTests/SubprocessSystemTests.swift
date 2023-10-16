@@ -10,14 +10,14 @@ final class SubprocessSystemTests: XCTestCase {
     
     @available(macOS 12.0, *)
     func testRunWithOutput() async throws {
-        let result = try await Subprocess(["/usr/bin/csrutil", "status"]).run().standardOutput.lines.first(where: { $0.contains("enabled") }) != nil
+        let result = try await Subprocess(["/bin/cat", softwareVersionFilePath]).run().standardOutput.lines.first(where: { $0.contains("ProductName") }) != nil
         
         XCTAssertTrue(result)
     }
     
     @available(macOS 12.0, *)
     func testRunWithStandardOutput() async throws {
-        let result = try await Subprocess(["/usr/bin/csrutil", "status"]).run(options: .standardOutput).standardOutput.lines.first(where: { $0.contains("enabled") }) != nil
+        let result = try await Subprocess(["/bin/cat", softwareVersionFilePath]).run(options: .standardOutput).standardOutput.lines.first(where: { $0.contains("ProductName") }) != nil
         
         XCTAssertTrue(result)
     }
@@ -30,13 +30,13 @@ final class SubprocessSystemTests: XCTestCase {
     }
     
     func testRunWithCombinedOutput() async throws {
-        let process = Subprocess(["/usr/bin/csrutil", "status"])
+        let process = Subprocess(["/bin/cat", softwareVersionFilePath])
         let (standardOutput, standardError, waitForExit) = try process.run()
         async let (stdout, stderr) = (standardOutput, standardError)
         let combinedOutput = await [stdout.string(), stderr.string()]
         
         await waitForExit()
-        XCTAssertTrue(combinedOutput[0].contains("enabled"))
+        XCTAssertTrue(combinedOutput[0].contains("ProductName"))
     }
     
     @available(macOS 12.0, *)
