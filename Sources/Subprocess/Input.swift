@@ -27,6 +27,7 @@
 import Foundation
 
 /// Interface representing input to the process
+@available(*, deprecated, message: "This type is no longer used with methods supporting Swift Concurrency")
 public struct Input {
 
     /// Reference to the input value

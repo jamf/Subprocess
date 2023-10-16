@@ -24,44 +24,34 @@ SubprocessMocks can be used in unit tests for quick and highly customizable mock
 [Full Documentation](./docs/index.html)
 
 # Usage
-### Shell Class
-The Shell class can be used for synchronous command execution.
+### Subprocess Class
+The `Subprocess` class can be used for command execution.
 
 #### Command Input
 
 ###### Input for data
 ```swift
-let inputData: Data = ...
-let data = try Shell(["/usr/bin/grep", "Hello"]).exec(input: .data(inputData))
+let inputData: Data = "hello world".data(using: .utf8)!
+let data = try await Subprocess.data(for: ["/usr/bin/grep", "hello"], standardInput: inputData)
 ```
 ###### Input for text
 ```swift
-let data = try Shell(["/usr/bin/grep", "Hello"]).exec(input: .text("Hello world"))
+let data = try await Subprocess.data(for: ["/usr/bin/grep", "hello"], standardInput: "hello world")
 ```
 ###### Input for file URL
 ```swift
-let url = URL(fileURLWithPath: "/path/to/input/file")
-let data = try Shell(["/usr/bin/grep", "foo"]).exec(input: .file(url: url))
-```
-###### Input for file path
-```swift
-let data = try Shell(["/usr/bin/grep", "foo"]).exec(input: .file(path: "/path/to/input/file"))
+let data = try await Subprocess.data(for: ["/usr/bin/grep", "foo"], standardInput: URL(filePath: "/path/to/input/file"))
 ```
 
 #### Command Output
 
 ###### Output as Data
 ```swift
-let data = try Shell(["/usr/bin/sw_vers"]).exec()
+let data = try await Subprocess.data(for: ["/usr/bin/sw_vers"])
 ```
 ###### Output as String
 ```swift
-let text = try Shell(["/usr/bin/sw_vers"]).exec(encoding: .utf8)
-```
-###### Output as JSON (Array or Dictionary)
-```swift
-let command = ["/usr/bin/log", "show", "--style", "json", "--last", "5m"]
-let logs: [[String: Any]] = try Shell(command).execJSON())
+let string = try await Subprocess.string(for: ["/usr/bin/sw_vers"])
 ```
 ###### Output as decodable object from JSON
 ```swift
@@ -70,13 +60,8 @@ struct LogMessage: Codable {
     var category: String
     var machTimestamp: UInt64
 }
-let command = ["/usr/bin/log", "show", "--style", "json", "--last", "5m"]
-let logs: [LogMessage] = try Shell(command).exec(decoder: JSONDecoder())
-```
-###### Output as Property List (Array or Dictionary)
-```swift
-let command = ["/bin/cat", "/System/Library/CoreServices/SystemVersion.plist"]
-let dictionary: [String: Any] = try Shell(command).execPropertyList())
+
+let result: [LogMessage] = try await Subprocess.value(for: ["/usr/bin/log", "show", "--style", "json", "--last", "30s"], decoder: JSONDecoder())
 ```
 ###### Output as decodable object from Property List
 ```swift
@@ -86,60 +71,88 @@ struct SystemVersion: Codable {
     }
     var version: String
 }
-let command = ["/bin/cat", "/System/Library/CoreServices/SystemVersion.plist"]
-let result: SystemVersion = try Shell(command).exec(decoder: PropertyListDecoder())
+
+let result: SystemVersion = try await Subprocess.value(for: ["/bin/cat", "/System/Library/CoreServices/SystemVersion.plist"], decoder: PropertyListDecoder())
 ```
 ###### Output mapped to other type 
 ```swift
-let enabled = try Shell(["csrutil", "status"]).exec(encoding: .utf8) { _, txt in txt.contains("enabled") }
+let enabled = try await Subprocess(["/usr/bin/csrutil", "status"]).run().standardOutput.lines.first(where: { $0.contains("enabled") } ) != nil
 ```
-
 ###### Output options
 ```swift
-let command: [String] = ...
-let errorText = try Shell(command).exec(options: .stderr, encoding: .utf8)
-let outputText = try Shell(command).exec(options: .stdout, encoding: .utf8)
-let combinedData = try Shell(command).exec(options: .combined)
-```
-### Subprocess Class
-The Subprocess class can be used for asynchronous command execution.
+let errorText = try await Subprocess.string(for: ["/usr/bin/cat", "/non/existent/file.txt"], options: .returnStandardError)
+let outputText = try await Subprocess.string(for: ["/usr/bin/sw_vers"])
 
+async let (standardOutput, standardError, _) = try Subprocess(["/usr/bin/csrutil", "status"]).run()
+let combinedOutput = try await [standardOutput.string(), standardError.string()]
+```
 ###### Handling output as it is read
 ```swift
-let command: [String] = ...
-let process = Subprocess(command)
+let (stream, input) = {
+    var input: AsyncStream<UInt8>.Continuation!
+    let stream: AsyncStream<UInt8> = AsyncStream { continuation in
+        input = continuation
+    }
 
-// The outputHandler and errorHandler are invoked serially
-try process.launch(outputHandler: { data in
-    // Handle new data read from stdout
-}, errorHandler: { data in
-    // Handle new data read from stderr
-}, terminationHandler: { process in
-    // Handle process termination, all scheduled calls to
-    // the outputHandler and errorHandler are guaranteed to
-    // have completed.
-})
+    return (stream, input!)
+}()
+
+let subprocess = Subprocess(["/bin/cat"])
+let (standardOutput, _, waitForExit) = try subprocess.run(standardInput: stream)
+
+input.yield("hello\n")
+
+Task {
+    for await line in standardOutput.lines {
+        switch line {
+        case "hello":
+            input.yield("world\n")
+        case "world":
+            input.yield("and\nuniverse")
+            input.finish()
+        case "universe":
+            await waitForExit()
+            break
+        default:
+            continue
+        }
+    }
+}
 ```
 ###### Handling output on termination
 ```swift
-let command: [String] = ...
-let process = Subprocess(command)
+let process = Subprocess(["/usr/bin/csrutil", "status"])
+let (standardOutput, standardError, waitForExit) = try process.run()
+async let (stdout, stderr) = (standardOutput, standardError)
+let combinedOutput = await [stdout.data(), stderr.data()]
 
-try process.launch { (process, outputData, errorData) in
-    if process.exitCode == 0 {
-        // Do something with output data
-    } else {
-        // Handle failure
-    }
+await waitForExit()
+
+if process.exitCode == 0 {
+    // Do something with output data
+} else {
+    // Handle failure
 }
 ```
 
 ## Installation
 ### SwiftPM
 ```swift
-dependencies: [
-	.package(url: "https://github.com/jamf/Subprocess.git", from: "1.0.0")
-]
+let package = Package(
+    // name, platforms, products, etc.
+    dependencies: [
+        // other dependencies
+        .package(url: "https://github.com/jamf/Subprocess.git", .upToNextMajor(from: "3.0.0")),
+    ],
+    targets: [
+        .target(name: "<target>",
+        dependencies: [
+            // other dependencies
+            .product(name: "Subprocess"),
+        ]),
+        // other targets
+    ]
+)
 ```
 ### Cocoapods
 ```ruby

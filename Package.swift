@@ -1,10 +1,10 @@
-// swift-tools-version:5.1
+// swift-tools-version: 5.9
 
 import PackageDescription
 
 let package = Package(
     name: "Subprocess",
-    platforms: [ .macOS(.v10_13) ],
+    platforms: [ .macOS("10.15.4") ],
     products: [
         .library(
             name: "Subprocess",
@@ -28,7 +28,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0")
+        .package(url: "https://github.com/apple/swift-docc-plugin", .upToNextMajor(from: "1.0.0"))
     ],
     targets: [
         .target(

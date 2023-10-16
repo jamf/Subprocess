@@ -1,17 +1,17 @@
 Pod::Spec.new do |s|
   s.name         = 'Subprocess'
-  s.version      = '2.0.0'
+  s.version      = '3.0.0'
   s.summary      = 'Wrapper for NSTask used for running processes and shell commands on macOS.'
   s.license      = { :type => 'MIT', :text => "" }
   s.description  = <<-DESC
                     Everything related to creating processes and running shell commands on macOS.
                    DESC
   s.homepage     = 'https://github.com/jamf/Subprocess'
-  s.authors      = { 'Cyrus Ingraham' => 'cyrus.ingraham@jamf.com' }
+  s.authors      = { 'Cyrus Ingraham' => 'cyrus.ingraham@jamf.com', 'Michael Link' => 'michael.link@jamf.com' }
   s.source       = { :git => "https://github.com/jamf/Subprocess.git", :tag => s.version.to_s }
-  s.platform = :osx, '10.13'
-  s.osx.deployment_target = '10.13'
-  s.swift_version = '5.1'
+  s.platform = :osx, '10.15.4'
+  s.osx.deployment_target = '10.15.4'
+  s.swift_version = '5.9'
   s.default_subspec = 'Core'
 
   s.pod_target_xcconfig = { 'OTHER_SWIFT_FLAGS' => '-DCOCOA_PODS' }

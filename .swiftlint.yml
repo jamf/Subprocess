@@ -1,0 +1,9 @@
+disabled_rules:
+- trailing_whitespace # Xcode automatically adds space for new lines
+- line_length # IDE is good at wrapping long lines
+- function_body_length
+- file_length # doesn't play nice when you need to have private in the same file
+- identifier_name
+- nesting
+- large_tuple
+- colon # doesn't follow Swift formatting

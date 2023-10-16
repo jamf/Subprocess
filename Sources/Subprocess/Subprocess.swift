@@ -26,48 +26,527 @@
 //
 
 import Foundation
+import Combine
 
 /// Class used for asynchronous process execution
-open class Subprocess {
-
+open class Subprocess: @unchecked Sendable {
+    /// Output options.
+    public struct OutputOptions: OptionSet {
+        public let rawValue: Int
+        
+        /// Buffer standard output.
+        public static let standardOutput = Self(rawValue: 1 << 0)
+        
+        /// Buffer standard error which may include useful error messages.
+        public static let standardError = Self(rawValue: 1 << 1)
+        
+        public init(rawValue: Int) {
+            self.rawValue = rawValue
+        }
+    }
+    
     /// Process reference
-    let reference: Process
-
+    let process: Process
+    
     /// Process identifier
-    public var pid: Int32 { reference.processIdentifier }
-
+    public var pid: Int32 { process.processIdentifier }
+    
     /// Exit code of the process
-    public var exitCode: Int32 { reference.terminationStatus }
-
+    public var exitCode: Int32 { process.terminationStatus }
+    
     /// Returns whether the process is still running.
-    public var isRunning: Bool { reference.isRunning }
-
+    public var isRunning: Bool { process.isRunning }
+    
     /// Reason for process termination
-    public var terminationReason: Process.TerminationReason { reference.terminationReason }
-
+    public var terminationReason: Process.TerminationReason { process.terminationReason }
+    
     /// Reference environment property
     public var environment: [String: String]? {
         get {
-            reference.environment
+            process.environment
         }
         set {
-            reference.environment = newValue
+            process.environment = newValue
         }
     }
-
+    
+    private lazy var group = DispatchGroup()
+    
     /// Creates new Subprocess
     ///
     /// - Parameter command: Command represented as an array of strings
-    public init(_ command: [String], qos: DispatchQoS = .default) {
-        reference = SubprocessDependencyBuilder.shared.makeProcess(command: command)
-        queue = DispatchQueue(label: "SubprocessQueue",
-                              qos: qos,
-                              attributes: [],
-                              autoreleaseFrequency: .workItem,
-                              target: nil)
-
+    public required init(_ command: [String]) {
+        process = SubprocessDependencyBuilder.shared.makeProcess(command: command)
     }
+    
+    // You may ask yourself, "Well, how did I get here?"
+    // It would be nice if we could write something like:
+    //
+    // public func run<Input>(standardInput: Input? = nil, options: OutputOptions = [.standardOutput, .standardError]) throws -> (standardOutput: Pipe.AsyncBytes, standardError: Pipe.AsyncBytes, waitUntilExit: () async -> Void) where Input : AsyncSequence, Input.Element == UInt8 {}
+    //
+    // Then the equivelent convenience methods below could take an AsyncSequence as well in the same style.
+    //
+    // The problem with this is that AsyncSequence is a rethrowing protocol that has no primary associated type. So it's always up to the caller of the method to specify its type and if the default nil is used then it can't determine the type thus causing a compile time error.
+    // There are a few Swift Forum threads discussing the problems with AsyncSequence in interfaces:
+    // https://forums.swift.org/t/anyasyncsequence/50828/33
+    // https://forums.swift.org/t/type-erasure-of-asyncsequences/66547/23
+    //
+    // The solution used here is to unfortunately have an extra method that just omits the standard input when its not going to be used. I believe the interface is well defined this way and easier to use in the end without strange hacks or conversions to AsyncStream.
+    
+    /// Run a command.
+    ///
+    /// - Parameters:
+    ///   - options: Options to control which output should be returned.
+    /// - Returns: The standard output and standard error as `Pipe.AsyncBytes` sequences and an optional closure that can be used to `await` the process until it has completed.
+    ///
+    /// Run a command and optionally read its output.
+    ///
+    ///     let subprocess = Subprocess(["/bin/cat somefile"])
+    ///     let (standardOutput, _, waitForExit) = try subprocess.run()
+    ///
+    ///     Task {
+    ///         for await line in standardOutput.lines {
+    ///             switch line {
+    ///             case "hello":
+    ///                 await waitForExit()
+    ///                 break
+    ///             default:
+    ///                 continue
+    ///             }
+    ///         }
+    ///     }
+    ///
+    /// It is the callers responsibility to ensure that any reads occur if waiting for the process to exit otherwise a deadlock can happen if the process is waiting to write to its output buffer.
+    /// A task group can be used to wait for exit while reading the output. If the output is discardable consider passing (`[]`) an empty set for the options which effectively flushes output to null.
+    public func run(options: OutputOptions = [.standardOutput, .standardError]) throws -> (standardOutput: Pipe.AsyncBytes, standardError: Pipe.AsyncBytes, waitUntilExit: () async -> Void) {
+        let standardOutput: Pipe.AsyncBytes = {
+            if options.contains(.standardOutput) {
+                let pipe = Pipe()
+                
+                process.standardOutput = pipe
+                return pipe.bytes
+            } else {
+                let pipe = Pipe()
+                
+                defer {
+                    try? pipe.fileHandleForReading.close()
+                }
+                
+                process.standardOutput = FileHandle.nullDevice
+                return pipe.bytes
+            }
+        }()
+        let standardError: Pipe.AsyncBytes = {
+            if options.contains(.standardError) {
+                let pipe = Pipe()
+                
+                process.standardError = pipe
+                return pipe.bytes
+            } else {
+                let pipe = Pipe()
+                
+                defer {
+                    try? pipe.fileHandleForReading.close()
+                }
+                
+                process.standardError = FileHandle.nullDevice
+                return pipe.bytes
+            }
+        }()
+        
+        let terminationContinuation = TerminationContinuation()
+        let task: Task<Void, Never> = Task.detached {
+            await withUnsafeContinuation { continuation in
+                Task {
+                    await terminationContinuation.setContinuation(continuation)
+                }
+            }
+        }
+        let waitUntilExit = {
+            await task.value
+        }
+        
+        process.terminationHandler = { _ in
+            Task {
+                await terminationContinuation.resume()
+            }
+        }
+        
+        try process.run()
+        return (standardOutput, standardError, waitUntilExit)
+    }
+    
+    /// Run an interactive command.
+    ///
+    /// - Parameters:
+    ///   - standardInput: An `AsyncSequence` that is used to supply input to the underlying process.
+    ///   - options: Options to control which output should be returned.
+    /// - Returns: The standard output and standard error as `Pipe.AsyncBytes` sequences and an optional closure that can be used to `await` the process until it has completed.
+    ///
+    /// Run a command and interactively respond to output.
+    ///
+    ///     let (stream, input) = {
+    ///         var input: AsyncStream<UInt8>.Continuation!
+    ///         let stream: AsyncStream<UInt8> = AsyncStream { continuation in
+    ///             input = continuation
+    ///         }
+    ///
+    ///         return (stream, input!)
+    ///     }()
+    ///
+    ///     let subprocess = Subprocess(["/bin/cat"])
+    ///     let (standardOutput, _, waitForExit) = try subprocess.run(standardInput: stream)
+    ///
+    ///     input.yield("hello\n")
+    ///
+    ///     Task {
+    ///         for await line in standardOutput.lines {
+    ///             switch line {
+    ///             case "hello":
+    ///                 input.yield("world\n")
+    ///             case "world":
+    ///                 input.yield("and\nuniverse")
+    ///                 input.finish()
+    ///             case "universe":
+    ///                 await waitForExit()
+    ///                 break
+    ///             default:
+    ///                 continue
+    ///             }
+    ///         }
+    ///     }
+    ///
+    public func run<Input>(standardInput: Input, options: OutputOptions = [.standardOutput, .standardError]) throws -> (standardOutput: Pipe.AsyncBytes, standardError: Pipe.AsyncBytes, waitUntilExit: () async -> Void) where Input : AsyncSequence, Input.Element == UInt8 {
+        let pipe = Pipe()
+        // see here: https://developer.apple.com/forums/thread/690382
+        let result = fcntl(pipe.fileHandleForWriting.fileDescriptor, F_SETNOSIGPIPE, 1)
+        
+        guard result >= 0 else {
+            throw NSError(domain: NSPOSIXErrorDomain, code: Int(result), userInfo: nil)
+        }
+        
+        pipe.fileHandleForWriting.writeabilityHandler = { handle in
+            handle.writeabilityHandler = nil
 
+            Task {
+                defer {
+                    try? handle.close()
+                }
+                
+                // `DispatchIO` seems like an interesting solution but doesn't seem to mesh well with async/await, perhaps there will be updates in this area in the future.
+                // https://developer.apple.com/forums/thread/690310
+                // According to Swift forum talk byte by byte reads _could_ be optimized by the compiler depending on how much visibility it has into methods.
+                for try await byte in standardInput {
+                    try handle.write(contentsOf: [byte])
+                }
+            }
+        }
+        
+        process.standardInput = pipe
+        return try run(options: options)
+    }
+    
+    /// Suspends the command
+    public func suspend() -> Bool {
+        process.suspend()
+    }
+    
+    /// Resumes the command which was suspended
+    public func resume() -> Bool {
+        process.resume()
+    }
+    
+    /// Sends the command the term signal
+    public func kill() {
+        process.terminate()
+    }
+}
+
+// Methods for typical one-off acquisition of output from running some command.
+extension Subprocess {
+    /// Additional configuration options.
+    public struct RunOptions: OptionSet {
+        public let rawValue: Int
+
+        /// Throw an error if the process exited with a non-zero exit code.
+        public static let throwErrorOnNonZeroExit = Self(rawValue: 1 << 0)
+        
+        /// Return the output from standard error instead of standard output.
+        public static let returnStandardError = Self(rawValue: 1 << 1)
+        
+        public init(rawValue: Int) {
+            self.rawValue = rawValue
+        }
+    }
+    
+    /// Retreive output as `Data` from running an external command.
+    /// - Parameters:
+    ///   - command: An external command to run with optional arguments.
+    ///   - standardInput: A type conforming to `DataProtocol` (typically a `Data` type) from which to read input to the external command.
+    ///   - options: Options used to specify runtime behavior.
+    public static func data(for command: [String], standardInput: (any DataProtocol)? = nil, options: RunOptions = .throwErrorOnNonZeroExit) async throws -> Data {
+        let subprocess = Self(command)
+        let (standardOutput, standardError, waitForExit) = if let standardInput {
+            try subprocess.run(standardInput: AsyncStream(UInt8.self, { continuation in
+                for byte in standardInput {
+                    if case .terminated = continuation.yield(byte) {
+                        break
+                    }
+                }
+                
+                continuation.finish()
+            }))
+        } else {
+            try subprocess.run()
+        }
+        
+        // need to read output for processes that fill their buffers otherwise a wait could occur waiting for a read to clear the buffer
+        let result = await withTaskGroup(of: Void.self) { group in
+            let stdoutData = UnsafeData()
+            let stderrData = UnsafeData()
+            
+            group.addTask {
+                await withTaskCancellationHandler(operation: {
+                    await waitForExit()
+                }, onCancel: {
+                    subprocess.kill()
+                })
+            }
+            group.addTask {
+                var bytes = [UInt8]()
+                
+                for await byte in standardOutput {
+                    bytes.append(byte)
+                }
+                
+                stdoutData.set(Data(bytes))
+            }
+            group.addTask {
+                var bytes = [UInt8]()
+                
+                for await byte in standardError {
+                    bytes.append(byte)
+                }
+                
+                stderrData.set(Data(bytes))
+            }
+            
+            for await _ in group {
+                // nothing to collect here
+            }
+            
+            return (standardOutputData: stdoutData.value(), standardErrorData: stderrData.value())
+        }
+        try Task.checkCancellation()
+        
+        if options.contains(.throwErrorOnNonZeroExit), subprocess.process.terminationStatus != 0 {
+            throw Error.nonZeroExit(status: subprocess.process.terminationStatus, reason: subprocess.process.terminationReason, standardOutput: result.standardOutputData, standardError: String(decoding: result.standardErrorData, as: UTF8.self))
+        }
+        
+        let data = if options.contains(.returnStandardError) {
+            result.standardErrorData
+        } else {
+            result.standardOutputData
+        }
+        
+        return data
+    }
+    
+    // MARK: Data convenience methods
+    
+    /// Retreive output as `Data` from running an external command.
+    /// - Parameters:
+    ///   - command: An external command to run with optional arguments.
+    ///   - standardInput: A `String` from which to send input to the external command.
+    ///   - options: Options used to specify runtime behavior.
+    @inlinable
+    public static func data(for command: [String], standardInput: String, options: RunOptions = .throwErrorOnNonZeroExit) async throws -> Data {
+        try await data(for: command, standardInput: standardInput.data(using: .utf8)!, options: options)
+    }
+    
+    /// Retreive output as `Data` from running an external command.
+    /// - Parameters:
+    ///   - command: An external command to run with optional arguments.
+    ///   - standardInput: A file `URL` from which to read input to the external command.
+    ///   - options: Options used to specify runtime behavior.
+    public static func data(for command: [String], standardInput: URL, options: RunOptions = .throwErrorOnNonZeroExit) async throws -> Data {
+        let subprocess = Self(command)
+        let (standardOutput, standardError, waitForExit) = if #available(macOS 12.0, *) {
+            try subprocess.run(standardInput: SubprocessDependencyBuilder.shared.makeInputFileHandle(url: standardInput).bytes)
+        } else if let fileData = try SubprocessDependencyBuilder.shared.makeInputFileHandle(url: standardInput).readToEnd(), !fileData.isEmpty {
+            try subprocess.run(standardInput: AsyncStream(UInt8.self, { continuation in
+                for byte in fileData {
+                    if case .terminated = continuation.yield(byte) {
+                        break
+                    }
+                }
+                
+                continuation.finish()
+            }))
+        } else {
+            try subprocess.run()
+        }
+        
+        // need to read output for processes that fill their buffers otherwise a wait could occur waiting for a read to clear the buffer
+        let result = await withTaskGroup(of: Void.self) { group in
+            let stdoutData = UnsafeData()
+            let stderrData = UnsafeData()
+            
+            group.addTask {
+                await withTaskCancellationHandler(operation: {
+                    await waitForExit()
+                }, onCancel: {
+                    subprocess.kill()
+                })
+            }
+            group.addTask {
+                var bytes = [UInt8]()
+                
+                for await byte in standardOutput {
+                    bytes.append(byte)
+                }
+                
+                stdoutData.set(Data(bytes))
+            }
+            group.addTask {
+                var bytes = [UInt8]()
+                
+                for await byte in standardError {
+                    bytes.append(byte)
+                }
+                
+                stderrData.set(Data(bytes))
+            }
+            
+            for await _ in group {
+                // nothing to collect
+            }
+            
+            return (standardOutputData: stdoutData.value(), standardErrorData: stderrData.value())
+        }
+        try Task.checkCancellation()
+        
+        if options.contains(.throwErrorOnNonZeroExit), subprocess.process.terminationStatus != 0 {
+            throw Error.nonZeroExit(status: subprocess.process.terminationStatus, reason: subprocess.process.terminationReason, standardOutput: result.standardOutputData, standardError: String(decoding: result.standardErrorData, as: UTF8.self))
+        }
+        
+        let data = if options.contains(.returnStandardError) {
+            result.standardErrorData
+        } else {
+            result.standardOutputData
+        }
+        
+        return data
+    }
+    
+    // MARK: String convenience methods
+    
+    /// Retreive output as a UTF8 `String` from running an external command.
+    /// - Parameters:
+    ///   - command: An external command to run with optional arguments.
+    ///   - standardInput: A type conforming to `DataProtocol` (typically a `Data` type) from which to read input to the external command.
+    ///   - options: Options used to specify runtime behavior.
+    @inlinable
+    public static func string(for command: [String], standardInput: (any DataProtocol)? = nil, options: RunOptions = .throwErrorOnNonZeroExit) async throws -> String {
+        String(decoding: try await data(for: command, standardInput: standardInput, options: options), as: UTF8.self)
+    }
+    
+    /// Retreive output as `String` from running an external command.
+    /// - Parameters:
+    ///   - command: An external command to run with optional arguments.
+    ///   - standardInput: A `String` from which to send input to the external command.
+    ///   - options: Options used to specify runtime behavior.
+    @inlinable
+    public static func string(for command: [String], standardInput: String, options: RunOptions = .throwErrorOnNonZeroExit) async throws -> String {
+        String(decoding: try await data(for: command, standardInput: standardInput, options: options), as: UTF8.self)
+    }
+    
+    /// Retreive output as `String` from running an external command.
+    /// - Parameters:
+    ///   - command: An external command to run with optional arguments.
+    ///   - standardInput: A file `URL` from which to read input to the external command.
+    ///   - options: Options used to specify runtime behavior.
+    @inlinable
+    public static func string(for command: [String], standardInput: URL, options: RunOptions = .throwErrorOnNonZeroExit) async throws -> String {
+        String(decoding: try await data(for: command, standardInput: standardInput, options: options), as: UTF8.self)
+    }
+    
+    // MARK: Decodable types convenience methods
+    
+    /// Retreive output from from running an external command.
+    /// - Parameters:
+    ///   - command: An external command to run with optional arguments.
+    ///   - standardInput: A type conforming to `DataProtocol` (typically a `Data` type) from which to read input to the external command.
+    ///   - options: Options used to specify runtime behavior.
+    ///   - decoder: A `TopLevelDecoder` that will be used to decode the data.
+    @inlinable
+    public static func value<Content, Decoder>(for command: [String], standardInput: (any DataProtocol)? = nil, options: RunOptions = .throwErrorOnNonZeroExit, decoder: Decoder) async throws -> Content where Content : Decodable, Decoder : TopLevelDecoder, Decoder.Input == Data {
+        try await decoder.decode(Content.self, from: data(for: command, standardInput: standardInput, options: options))
+    }
+    
+    /// Retreive output from from running an external command.
+    /// - Parameters:
+    ///   - command: An external command to run with optional arguments.
+    ///   - standardInput: A `String` from which to send input to the external command.
+    ///   - options: Options used to specify runtime behavior.
+    ///   - decoder: A `TopLevelDecoder` that will be used to decode the data.
+    @inlinable
+    public static func value<Content, Decoder>(for command: [String], standardInput: String, options: RunOptions = .throwErrorOnNonZeroExit, decoder: Decoder) async throws -> Content where Content : Decodable, Decoder : TopLevelDecoder, Decoder.Input == Data {
+        try await decoder.decode(Content.self, from: data(for: command, standardInput: standardInput, options: options))
+    }
+    
+    /// Retreive output from from running an external command.
+    /// - Parameters:
+    ///   - command: An external command to run with optional arguments.
+    ///   - standardInput: A file `URL` from which to read input to the external command.
+    ///   - options: Options used to specify runtime behavior.
+    ///   - decoder: A `TopLevelDecoder` that will be used to decode the data.
+    @inlinable
+    public static func value<Content, Decoder>(for command: [String], standardInput: URL, options: RunOptions = .throwErrorOnNonZeroExit, decoder: Decoder) async throws -> Content where Content : Decodable, Decoder : TopLevelDecoder, Decoder.Input == Data {
+        try await decoder.decode(Content.self, from: data(for: command, standardInput: standardInput, options: options))
+    }
+}
+
+extension Subprocess {
+    /// Errors specific to `Subprocess`.
+    public enum Error: LocalizedError {
+        case nonZeroExit(status: Int32, reason: Process.TerminationReason, standardOutput: Data, standardError: String)
+        
+        public var errorDescription: String? {
+            switch self {
+            case let .nonZeroExit(status: terminationStatus, reason: _, standardOutput: _, standardError: errorString):
+                return "Process exited with status \(terminationStatus): \(errorString)"
+            }
+        }
+    }
+}
+
+private actor TerminationContinuation {
+    private var continuation: UnsafeContinuation<Void, Never>?
+    private var didResume = false
+    
+    deinit {
+        continuation?.resume()
+    }
+    
+    func setContinuation(_ continuation: UnsafeContinuation<Void, Never>) {
+        self.continuation = continuation
+        
+        // in case the termination happened before the task was able to set the continuation
+        if didResume {
+            resume()
+        }
+    }
+    
+    func resume() {
+        continuation?.resume()
+        continuation = nil
+        didResume = true
+    }
+}
+
+// Deprecations in favor of using async/await versions for running external processes.
+extension Subprocess {
     /// Launches command with read handlers and termination handler
     ///
     /// - Parameters:
@@ -75,98 +554,100 @@ open class Subprocess {
     ///     - outputHandler: Block called whenever new data is read from standard output of the process
     ///     - errorHandler: Block called whenever new data is read from standard error of the process
     ///     - terminationHandler: Block called when process has terminated and all output handlers have returned
-    public func launch(input: Input? = nil,
-                       outputHandler: ((Data) -> Void)? = nil,
-                       errorHandler: ((Data) -> Void)? = nil,
-                       terminationHandler: ((Subprocess) -> Void)? = nil) throws {
-
-        reference.standardInput = try input?.createPipeOrFileHandle()
-
-        if let handler = outputHandler {
-            reference.standardOutput = createPipeWithReadabilityHandler(handler)
+    @available(*, deprecated, message: "Use Swift Concurrency methods instead, run(standardInput:options:)")
+    public func launch(input: Input? = nil, outputHandler: (@Sendable (Data) -> Void)? = nil, errorHandler: (@Sendable (Data) -> Void)? = nil, terminationHandler: (@Sendable (Subprocess) -> Void)? = nil) throws {
+        process.standardInput = try input?.createPipeOrFileHandle()
+        
+        process.standardOutput = if let outputHandler {
+            createPipeWithReadabilityHandler(outputHandler)
         } else {
-            reference.standardOutput = FileHandle.nullDevice
+            FileHandle.nullDevice
         }
-
-        if let handler = errorHandler {
-            reference.standardError = createPipeWithReadabilityHandler(handler)
+        
+        process.standardError = if let errorHandler {
+            createPipeWithReadabilityHandler(errorHandler)
         } else {
-            reference.standardError = FileHandle.nullDevice
+            FileHandle.nullDevice
         }
-
+        
         group.enter()
-        reference.terminationHandler = { [weak self] _ in
-            self?.group.leave()
-            self?.reference.terminationHandler = nil
+        process.terminationHandler = { [unowned self] _ in
+            group.leave()
         }
-
-        group.notify(queue: queue) {
+        
+        group.notify(queue: .main) {
             terminationHandler?(self)
         }
-
-        if #available(OSX 10.13, *) {
-            try reference.run()
-        } else {
-            reference.launch()
-        }
+        
+        try process.run()
     }
-
+    
     /// Block type called for executing process returning data from standard out and standard error
-    public typealias DataTerminationHandler = (_ process: Subprocess, _ stdout: Data, _ stderr: Data) -> Void
-
+    public typealias DataTerminationHandler = @Sendable (_ process: Subprocess, _ stdout: Data, _ stderr: Data) -> Void
+    
     /// Launches command calling a block when process terminates
     ///
     /// - Parameters:
-    ///     - input: File or data to write to standard input of the process
+    ///     - input: File or data to write to standard input of the processcu
     ///     - terminationHandler: Block called with Subprocess, stdout Data, stderr Data
-    public func launch(input: Input? = nil,
-                       terminationHandler: @escaping DataTerminationHandler) throws {
-        var stdoutBuffer = Data()
-        var stderrBuffer = Data()
+    @available(*, deprecated, message: "Use Swift Concurrency methods instead, run(standardInput:options:)")
+    public func launch(input: Input? = nil, terminationHandler: @escaping DataTerminationHandler) throws {
+        let stdoutData = UnsafeData()
+        let stderrData = UnsafeData()
+        
         try launch(input: input, outputHandler: { data in
-            stdoutBuffer.append(data)
+            stdoutData.append(data)
         }, errorHandler: { data in
-            stderrBuffer.append(data)
+            stderrData.append(data)
         }, terminationHandler: { selfRef in
-            terminationHandler(selfRef, stdoutBuffer, stderrBuffer)
+            let standardOutput = stdoutData.value()
+            let standardError = stderrData.value()
+            
+            terminationHandler(selfRef, standardOutput, standardError)
         })
     }
-
-    /// Suspends the command
-    public func suspend() -> Bool {
-        return reference.suspend()
-    }
-
-    /// Resumes the command which was suspended
-    public func resume() -> Bool {
-        return reference.resume()
-    }
-
-    /// Sends the command the term signal
-    public func kill() {
-        reference.terminate()
-    }
-
-    /// Waits for process to complete and all handlers to be called
+    
+    /// Waits for process to complete and all handlers to be called. Not to be
+    /// confused with `Process.waitUntilExit()` which can return before its
+    /// `terminationHandler` is called.
+    /// Calling this method when using the non-deprecated methods will return immediately and not wait for the process to exit.
+    @available(*, deprecated, message: "Use Swift Concurrency methods instead")
     public func waitForTermination() {
         group.wait()
     }
-
-    private let group = DispatchGroup()
-    private let queue: DispatchQueue
-
-    private func createPipeWithReadabilityHandler(_ handler: @escaping (Data) -> Void) -> Pipe {
+    
+    @available(*, deprecated, message: "Use Swift Concurrency methods instead")
+    private func createPipeWithReadabilityHandler(_ handler: @escaping @Sendable (Data) -> Void) -> Pipe {
         let pipe = Pipe()
+        
         group.enter()
-        pipe.fileHandleForReading.readabilityHandler = { handle in
-            let data = handle.availableData
-            if data.isEmpty {
-                self.queue.async { self.group.leave() }
-                handle.readabilityHandler = nil
-            } else {
-                self.queue.async { handler(data) }
+        
+        let stream: AsyncStream<Data> = AsyncStream { continuation in
+            pipe.fileHandleForReading.readabilityHandler = { handle in
+                let data = handle.availableData
+                
+                guard !data.isEmpty else {
+                    handle.readabilityHandler = nil
+                    continuation.finish()
+                    return
+                }
+                
+                continuation.yield(data)
+            }
+            
+            continuation.onTermination = { _ in
+                pipe.fileHandleForReading.readabilityHandler = nil
             }
         }
+        
+        Task {
+            for await data in stream {
+                handler(data)
+            }
+            
+            group.leave()
+        }
+        
         return pipe
     }
 }

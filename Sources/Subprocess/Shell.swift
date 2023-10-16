@@ -28,6 +28,7 @@
 import Foundation
 
 /// Class used for synchronous process execution
+@available(*, deprecated, message: "Use Swift Concurrency methods instead which are part of the Subprocess class")
 public class Shell {
 
     /// OptionSet representing output handling
@@ -63,19 +64,33 @@ public class Shell {
     ///     - transformBlock: Block executed given a reference to the completed process and the output
     /// - Returns: Process output as output type of the `transformBlock`
     /// - Throws: Error from process launch,`transformBlock` or failing create a string from the process output
+    @available(*, deprecated, message: "Use Subprocess.value(for:standardInput:options:decoder:)")
     public func exec<T>(input: Input? = nil,
                         options: OutputOptions = .stdout,
                         transformBlock: (_ process: Subprocess, _ data: Data) throws -> T) throws -> T {
-        var stdoutBuffer = Data()
-        var stderrBuffer = Data()
-        try process.launch(input: input,
-                           outputHandler: options.contains(.stdout) ? { stdoutBuffer.append($0) } : nil,
-                           errorHandler: options.contains(.stderr) ? { stderrBuffer.append($0) } : nil)
+        let stdoutData = UnsafeData()
+        let stderrData = UnsafeData()
+        let outputHandler: (@Sendable (Data) -> Void)? = if options.contains(.stdout) {
+            { data in
+                stdoutData.append(data)
+            }
+        } else {
+            nil
+        }
+        let errorHandler: (@Sendable (Data) -> Void)? = if options.contains(.stderr) {
+            { data in
+                stderrData.append(data)
+            }
+        } else {
+            nil
+        }
+        
+        try process.launch(input: input, outputHandler: outputHandler, errorHandler: errorHandler)
         process.waitForTermination()
         // doing this so we can consistently get stdout before stderr when using the combined option
         var combinedBuffer = Data()
-        combinedBuffer.append(stdoutBuffer)
-        combinedBuffer.append(stderrBuffer)
+        combinedBuffer.append(stdoutData.value())
+        combinedBuffer.append(stderrData.value())
         return try transformBlock(process, combinedBuffer)
     }
 
@@ -86,6 +101,7 @@ public class Shell {
     ///     - options: Output options defining the output to process (Default: .stdout)
     /// - Returns: Process output data
     /// - Throws: Error from process launch or if termination code is none-zero
+    @available(*, deprecated, message: "Use Subprocess.data(for:standardInput:options:)")
     public func exec(input: Input? = nil, options: OutputOptions = .stdout) throws -> Data {
         return try exec(input: input, options: options) { process, data in
             let exitCode = process.exitCode
@@ -107,6 +123,7 @@ public class Shell {
     ///     - transformBlock: Block executed given a reference to the completed process and the output as a string
     /// - Returns: Process output as output type of the `transformBlock`
     /// - Throws: Error from process launch,`transformBlock` or failing create a string from the process output
+    @available(*, deprecated, message: "Use Subprocess.value(for:standardInput:options:decoder:)")
     public func exec<T>(input: Input? = nil,
                         options: OutputOptions = .stdout,
                         encoding: String.Encoding,
@@ -127,6 +144,7 @@ public class Shell {
     ///     - encoding: Encoding to use for the output
     /// - Returns: Process output as a String
     /// - Throws: Error from process launch, if termination code is none-zero or failing create a string from the output
+    @available(*, deprecated, message: "Use Subprocess.string(for:standardInput:options:)")
     public func exec(input: Input? = nil,
                      options: OutputOptions = .stdout,
                      encoding: String.Encoding) throws -> String {
@@ -146,6 +164,7 @@ public class Shell {
     ///     - options: Output options defining the output to process (Default: .stdout)
     /// - Returns: Process output as an Array or Dictionary
     /// - Throws: Error from process launch, JSONSerialization or failing to cast to expected type
+    @available(*, deprecated, message: "Use Subprocess.value(for:standardInput:options:decoder:)")
     public func execJSON<T>(input: Input? = nil, options: OutputOptions = .stdout) throws -> T {
         return try exec(input: input, options: options) { _, data in
             let object = try JSONSerialization.jsonObject(with: data, options: [])
@@ -163,6 +182,7 @@ public class Shell {
     ///     - options: Output options defining the output to process (Default: .stdout)
     /// - Returns: Process output as an Array or Dictionary
     /// - Throws: Error from process launch, PropertyListSerialization or failing to cast to expected type
+    @available(*, deprecated, message: "Use Subprocess.value(for:standardInput:options:decoder:)")
     public func execPropertyList<T>(input: Input? = nil, options: OutputOptions = .stdout) throws -> T {
         return try exec(input: input, options: options) { _, data in
             let object = try PropertyListSerialization.propertyList(from: data, options: [], format: .none)
@@ -181,6 +201,7 @@ public class Shell {
     ///     - decoder: JSONDecoder instance used for decoding the output object
     /// - Returns: Process output as the decodable object type
     /// - Throws: Error from process launch or JSONDecoder
+    @available(*, deprecated, message: "Use Subprocess.value(for:standardInput:options:decoder:)")
     public func exec<T: Decodable>(input: Input? = nil,
                                    options: OutputOptions = .stdout,
                                    decoder: JSONDecoder) throws -> T {
@@ -195,6 +216,7 @@ public class Shell {
     ///     - decoder: PropertyListDecoder instance used for decoding the output object
     /// - Returns: Process output as the decodable object type
     /// - Throws: Error from process launch or PropertyListDecoder
+    @available(*, deprecated, message: "Use Subprocess.value(for:standardInput:options:decoder:)")
     public func exec<T: Decodable>(input: Input? = nil,
                                    options: OutputOptions = .stdout,
                                    decoder: PropertyListDecoder) throws -> T {

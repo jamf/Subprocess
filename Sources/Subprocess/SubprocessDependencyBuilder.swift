@@ -51,18 +51,27 @@ public protocol SubprocessDependencyFactory {
 
 /// Default implementation of SubprocessDependencyFactory
 public struct SubprocessDependencyBuilder: SubprocessDependencyFactory {
-
+    private static let queue = DispatchQueue(label: "\(Self.self)")
+    private static var _shared: any SubprocessDependencyFactory = SubprocessDependencyBuilder()
     /// Shared instance used for dependency creatation
-    public static var shared: SubprocessDependencyFactory = SubprocessDependencyBuilder()
+    public static var shared: any SubprocessDependencyFactory {
+        get {
+            queue.sync {
+                _shared
+            }
+        }
+        set {
+            queue.sync {
+                _shared = newValue
+            }
+        }
+    }
 
     public func makeProcess(command: [String]) -> Process {
         var tmp = command
         let process = Process()
-        if #available(OSX 10.13, *) {
-            process.executableURL = URL(fileURLWithPath: tmp.removeFirst())
-        } else {
-            process.launchPath = tmp.removeFirst()
-        }
+        
+        process.executableURL = URL(fileURLWithPath: tmp.removeFirst())
         process.arguments = tmp
         return process
     }
@@ -76,11 +85,7 @@ public struct SubprocessDependencyBuilder: SubprocessDependencyFactory {
         pipe.fileHandleForWriting.writeabilityHandler = { handle in
             handle.write(data)
             handle.writeabilityHandler = nil
-            if #available(OSX 10.15, *) {
-                try? handle.close()
-            } else {
-                handle.closeFile()
-            }
+            try? handle.close()
         }
         return pipe
     }

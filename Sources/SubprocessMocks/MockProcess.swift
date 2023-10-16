@@ -95,11 +95,7 @@ open class MockProcessReference: Process {
         var standardInput: Any?
         var standardOutput: Any?
         var standardError: Any?
-#if compiler(>=5.7)
         var terminationHandler: (@Sendable (Process) -> Void)?
-#else
-        var terminationHandler: ((Process) -> Void)?
-#endif
     }
     // swiftlint:enable nesting
 
@@ -107,7 +103,7 @@ open class MockProcessReference: Process {
 
     /// Creates a new `MockProcessReference` which throws an error on launch
     /// - Parameter error: Error thrown when `Process.run` is called
-    public init(withRunError error: Error) {
+    public init(withRunError error: any Error) {
         context = Context(runStub: { _ in throw error })
     }
 
@@ -129,6 +125,9 @@ open class MockProcessReference: Process {
 
     /// Block called when `Process.suspend` is called
     public var stubSuspend: (() -> Bool)?
+    
+    /// Block called when `Process.waitUntilExit` is called
+    public var stubWaitUntilExit: (() -> Void)?
 
     /// standardOutput object as a Pipe
     public var standardOutputPipe: Pipe? { standardOutput as? Pipe }
@@ -155,13 +154,8 @@ open class MockProcessReference: Process {
         guard context.state == .running else { return }
         context.state = (reason == .exit) ? .exited : .uncaughtSignal
         context.terminationStatus = statusCode
-        if #available(OSX 10.15, *) {
-            try? standardOutputPipe?.fileHandleForWriting.close()
-            try? standardErrorPipe?.fileHandleForWriting.close()
-        } else {
-            standardOutputPipe?.fileHandleForWriting.closeFile()
-            standardErrorPipe?.fileHandleForWriting.closeFile()
-        }
+        try? standardOutputPipe?.fileHandleForWriting.close()
+        try? standardErrorPipe?.fileHandleForWriting.close()
 
         guard let handler = terminationHandler else { return }
         terminationHandler = nil
@@ -189,6 +183,7 @@ open class MockProcessReference: Process {
     open override func terminate() {
         if let stub = stubTerminate {
             stub(self)
+            context.state = .exited
         } else {
             context.state = .uncaughtSignal
         }
@@ -209,19 +204,16 @@ open class MockProcessReference: Process {
         set { context.standardError = newValue }
     }
 
-#if compiler(>=5.7)
     open override var terminationHandler: (@Sendable (Process) -> Void)? {
         get { context.terminationHandler }
         set { context.terminationHandler = newValue }
     }
-#else
-    open override var terminationHandler: ((Process) -> Void)? {
-        get { context.terminationHandler }
-        set { context.terminationHandler = newValue }
-    }
-#endif
 
     open override func resume() -> Bool { stubResume?() ?? false }
 
     open override func suspend() -> Bool { stubSuspend?() ?? false }
+    
+    open override func waitUntilExit() {
+        stubWaitUntilExit?()
+    }
 }

@@ -39,7 +39,7 @@ public extension Subprocess {
     /// - Parameters:
     ///     - command: The command to mock
     ///     - error: Error thrown when `Process.run` is called
-    static func stub(_ command: [String], error: Error) {
+    static func stub(_ command: [String], error: any Swift.Error) {
         let mock = MockProcessReference(withRunError: error)
         MockSubprocessDependencyBuilder.shared.stub(command, process: mock)
     }
@@ -65,7 +65,7 @@ public extension Subprocess {
     ///     - line: Line number of source file where expect was called (Default: #line)
     static func expect(_ command: [String],
                        input: Input? = nil,
-                       error: Error,
+                       error: any Swift.Error,
                        file: StaticString = #file,
                        line: UInt = #line) {
         let mock = MockProcessReference(withRunError: error)
