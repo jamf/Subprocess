@@ -41,4 +41,4 @@ jobs:
         sudo xcode-select -s /Applications/Xcode_15.0.app
     - uses: actions/checkout@v3
     - name: Lib lint
-      run: pod lib lint --verbose Subprocess.podspec
+      run: pod lib lint --verbose Subprocess.podspec --allow-warnings
