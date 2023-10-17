@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
                     Everything related to creating processes and running shell commands on macOS.
                    DESC
   s.homepage     = 'https://github.com/jamf/Subprocess'
-  s.authors      = { 'Cyrus Ingraham' => 'cyrus.ingraham@jamf.com', 'Michael Link' => 'michael.link@jamf.com' }
+  s.authors      = { 'Michael Link' => 'michael.link@jamf.com' }
   s.source       = { :git => "https://github.com/jamf/Subprocess.git", :tag => s.version.to_s }
   s.platform = :osx, '10.15.4'
   s.osx.deployment_target = '10.15.4'

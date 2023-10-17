@@ -53,7 +53,7 @@ public protocol SubprocessDependencyFactory {
 public struct SubprocessDependencyBuilder: SubprocessDependencyFactory {
     private static let queue = DispatchQueue(label: "\(Self.self)")
     private static var _shared: any SubprocessDependencyFactory = SubprocessDependencyBuilder()
-    /// Shared instance used for dependency creatation
+    /// Shared instance used for dependency creation
     public static var shared: any SubprocessDependencyFactory {
         get {
             queue.sync {

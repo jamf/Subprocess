@@ -31,7 +31,7 @@ The `Subprocess` class can be used for command execution.
 
 ###### Input for data
 ```swift
-let inputData: Data = "hello world".data(using: .utf8)!
+let inputData = Data("hello world".utf8)
 let data = try await Subprocess.data(for: ["/usr/bin/grep", "hello"], standardInput: inputData)
 ```
 ###### Input for text
