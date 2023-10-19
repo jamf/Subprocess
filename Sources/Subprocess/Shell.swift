@@ -4,7 +4,7 @@
 //
 //  MIT License
 //
-//  Copyright (c) 2018 Jamf Software
+//  Copyright (c) 2023 Jamf
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal

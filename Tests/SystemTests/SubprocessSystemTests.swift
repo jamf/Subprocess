@@ -66,7 +66,7 @@ final class SubprocessSystemTests: XCTestCase {
     
     @available(macOS 12.0, *)
     func testInteractiveAsyncRun() throws {
-        let e = expectation(description: "\(#file):\(#line)")
+        let exp = expectation(description: "\(#file):\(#line)")
         let (stream, input) = {
             var input: AsyncStream<UInt8>.Continuation!
             let stream: AsyncStream<UInt8> = AsyncStream { continuation in
@@ -98,10 +98,10 @@ final class SubprocessSystemTests: XCTestCase {
                 }
             }
             
-            e.fulfill()
+            exp.fulfill()
         }
 
-        wait(for: [e])
+        wait(for: [exp])
     }
     
     func testData() async throws {
@@ -111,44 +111,44 @@ final class SubprocessSystemTests: XCTestCase {
     }
     
     func testDataWithInput() async throws {
-        let data = try await Subprocess.data(for: ["/bin/cat"], standardInput: "hello".data(using: .utf8)!)
+        let data = try await Subprocess.data(for: ["/bin/cat"], standardInput: Data("hello".utf8))
         
         XCTAssertEqual(String(decoding: data, as: UTF8.self), "hello")
     }
     
     @available(macOS 13.0, *)
     func testDataCancel() async throws {
-        let e = expectation(description: "\(#file):\(#line)")
+        let exp = expectation(description: "\(#file):\(#line)")
         let task = Task {
             do {
                 _ = try await Subprocess.data(for: ["/bin/cat"], standardInput: URL(filePath: "/dev/random"))
                 
                 XCTFail("expected task to be canceled")
             } catch {
-                e.fulfill()
+                exp.fulfill()
             }
         }
         
         try await Task.sleep(nanoseconds: 1_000_000_000)
         task.cancel()
-        await fulfillment(of: [e])
+        await fulfillment(of: [exp])
     }
     
     func testDataCancelWithoutInput() async throws {
-        let e = expectation(description: "\(#file):\(#line)")
+        let exp = expectation(description: "\(#file):\(#line)")
         let task = Task {
             do {
                 _ = try await Subprocess.data(for: ["/bin/cat", "/dev/random"])
                 
                 XCTFail("expected task to be canceled")
             } catch {
-                e.fulfill()
+                exp.fulfill()
             }
         }
         
         try await Task.sleep(nanoseconds: 1_000_000_000)
         task.cancel()
-        await fulfillment(of: [e])
+        await fulfillment(of: [exp])
     }
     
     func testString() async throws {

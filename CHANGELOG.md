@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed 
 - Breaking: `Subprocess.init` no longer accepts an argument for a dispatch queue's quality of service since the underlying implementation now uses Swift Concurrency and not GCD.
-- `Shell`, `Input` and `SubprocessError` have been deprecated in favor of using new replacement methods that support Swift Concurrency.
+- Breaking: `Input`s `text` case no longer accepts an encoding as utf8 is overwhelmingly common. Instead convert the string to data explicitly if an alternate encoding is required.
+- `Shell` and `SubprocessError` have been deprecated in favor of using new replacement methods that support Swift Concurrency and no longer for a synchronized wait.
 
 ## 2.0.0 - 2021-07-01
 

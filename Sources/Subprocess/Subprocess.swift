@@ -4,7 +4,7 @@
 //
 //  MIT License
 //
-//  Copyright (c) 2018 Jamf Software
+//  Copyright (c) 2023 Jamf
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -217,32 +217,7 @@ open class Subprocess: @unchecked Sendable {
     ///     }
     ///
     public func run<Input>(standardInput: Input, options: OutputOptions = [.standardOutput, .standardError]) throws -> (standardOutput: Pipe.AsyncBytes, standardError: Pipe.AsyncBytes, waitUntilExit: () async -> Void) where Input : AsyncSequence, Input.Element == UInt8 {
-        let pipe = Pipe()
-        // see here: https://developer.apple.com/forums/thread/690382
-        let result = fcntl(pipe.fileHandleForWriting.fileDescriptor, F_SETNOSIGPIPE, 1)
-        
-        guard result >= 0 else {
-            throw NSError(domain: NSPOSIXErrorDomain, code: Int(result), userInfo: nil)
-        }
-        
-        pipe.fileHandleForWriting.writeabilityHandler = { handle in
-            handle.writeabilityHandler = nil
-
-            Task {
-                defer {
-                    try? handle.close()
-                }
-                
-                // `DispatchIO` seems like an interesting solution but doesn't seem to mesh well with async/await, perhaps there will be updates in this area in the future.
-                // https://developer.apple.com/forums/thread/690310
-                // According to Swift forum talk byte by byte reads _could_ be optimized by the compiler depending on how much visibility it has into methods.
-                for try await byte in standardInput {
-                    try handle.write(contentsOf: [byte])
-                }
-            }
-        }
-        
-        process.standardInput = pipe
+        process.standardInput = try SubprocessDependencyBuilder.shared.makeInputPipe(sequence: standardInput)
         return try run(options: options)
     }
     
@@ -507,6 +482,109 @@ extension Subprocess {
     }
 }
 
+// closure based methods
+extension Subprocess {
+    /// Launches command with read handlers and termination handler
+    ///
+    /// - Parameters:
+    ///     - input: File or data to write to standard input of the process
+    ///     - outputHandler: Block called whenever new data is read from standard output of the process
+    ///     - errorHandler: Block called whenever new data is read from standard error of the process
+    ///     - terminationHandler: Block called when process has terminated and all output handlers have returned
+    public func launch(input: Input? = nil, outputHandler: (@Sendable (Data) -> Void)? = nil, errorHandler: (@Sendable (Data) -> Void)? = nil, terminationHandler: (@Sendable (Subprocess) -> Void)? = nil) throws {
+        process.standardInput = try input?.createPipeOrFileHandle()
+        
+        process.standardOutput = if let outputHandler {
+            createPipeWithReadabilityHandler(outputHandler)
+        } else {
+            FileHandle.nullDevice
+        }
+        
+        process.standardError = if let errorHandler {
+            createPipeWithReadabilityHandler(errorHandler)
+        } else {
+            FileHandle.nullDevice
+        }
+        
+        group.enter()
+        process.terminationHandler = { [unowned self] _ in
+            group.leave()
+        }
+        
+        group.notify(queue: .main) {
+            terminationHandler?(self)
+        }
+        
+        try process.run()
+    }
+    
+    /// Block type called for executing process returning data from standard out and standard error
+    public typealias DataTerminationHandler = @Sendable (_ process: Subprocess, _ stdout: Data, _ stderr: Data) -> Void
+    
+    /// Launches command calling a block when process terminates
+    ///
+    /// - Parameters:
+    ///     - input: File or data to write to standard input of the process
+    ///     - terminationHandler: Block called with Subprocess, stdout Data, stderr Data
+    public func launch(input: Input? = nil, terminationHandler: @escaping DataTerminationHandler) throws {
+        let stdoutData = UnsafeData()
+        let stderrData = UnsafeData()
+        
+        try launch(input: input, outputHandler: { data in
+            stdoutData.append(data)
+        }, errorHandler: { data in
+            stderrData.append(data)
+        }, terminationHandler: { selfRef in
+            let standardOutput = stdoutData.value()
+            let standardError = stderrData.value()
+            
+            terminationHandler(selfRef, standardOutput, standardError)
+        })
+    }
+    
+    /// Waits for process to complete and all handlers to be called. Not to be
+    /// confused with `Process.waitUntilExit()` which can return before its
+    /// `terminationHandler` is called.
+    /// Calling this method when using the non-deprecated methods will return immediately and not wait for the process to exit.
+    public func waitForTermination() {
+        group.wait()
+    }
+    
+    private func createPipeWithReadabilityHandler(_ handler: @escaping @Sendable (Data) -> Void) -> Pipe {
+        let pipe = Pipe()
+        
+        group.enter()
+        
+        let stream: AsyncStream<Data> = AsyncStream { continuation in
+            pipe.fileHandleForReading.readabilityHandler = { handle in
+                let data = handle.availableData
+                
+                guard !data.isEmpty else {
+                    handle.readabilityHandler = nil
+                    continuation.finish()
+                    return
+                }
+                
+                continuation.yield(data)
+            }
+            
+            continuation.onTermination = { _ in
+                pipe.fileHandleForReading.readabilityHandler = nil
+            }
+        }
+        
+        Task {
+            for await data in stream {
+                handler(data)
+            }
+            
+            group.leave()
+        }
+        
+        return pipe
+    }
+}
+
 extension Subprocess {
     /// Errors specific to `Subprocess`.
     public enum Error: LocalizedError {
@@ -542,112 +620,5 @@ private actor TerminationContinuation {
         continuation?.resume()
         continuation = nil
         didResume = true
-    }
-}
-
-// Deprecations in favor of using async/await versions for running external processes.
-extension Subprocess {
-    /// Launches command with read handlers and termination handler
-    ///
-    /// - Parameters:
-    ///     - input: File or data to write to standard input of the process
-    ///     - outputHandler: Block called whenever new data is read from standard output of the process
-    ///     - errorHandler: Block called whenever new data is read from standard error of the process
-    ///     - terminationHandler: Block called when process has terminated and all output handlers have returned
-    @available(*, deprecated, message: "Use Swift Concurrency methods instead, run(standardInput:options:)")
-    public func launch(input: Input? = nil, outputHandler: (@Sendable (Data) -> Void)? = nil, errorHandler: (@Sendable (Data) -> Void)? = nil, terminationHandler: (@Sendable (Subprocess) -> Void)? = nil) throws {
-        process.standardInput = try input?.createPipeOrFileHandle()
-        
-        process.standardOutput = if let outputHandler {
-            createPipeWithReadabilityHandler(outputHandler)
-        } else {
-            FileHandle.nullDevice
-        }
-        
-        process.standardError = if let errorHandler {
-            createPipeWithReadabilityHandler(errorHandler)
-        } else {
-            FileHandle.nullDevice
-        }
-        
-        group.enter()
-        process.terminationHandler = { [unowned self] _ in
-            group.leave()
-        }
-        
-        group.notify(queue: .main) {
-            terminationHandler?(self)
-        }
-        
-        try process.run()
-    }
-    
-    /// Block type called for executing process returning data from standard out and standard error
-    public typealias DataTerminationHandler = @Sendable (_ process: Subprocess, _ stdout: Data, _ stderr: Data) -> Void
-    
-    /// Launches command calling a block when process terminates
-    ///
-    /// - Parameters:
-    ///     - input: File or data to write to standard input of the processcu
-    ///     - terminationHandler: Block called with Subprocess, stdout Data, stderr Data
-    @available(*, deprecated, message: "Use Swift Concurrency methods instead, run(standardInput:options:)")
-    public func launch(input: Input? = nil, terminationHandler: @escaping DataTerminationHandler) throws {
-        let stdoutData = UnsafeData()
-        let stderrData = UnsafeData()
-        
-        try launch(input: input, outputHandler: { data in
-            stdoutData.append(data)
-        }, errorHandler: { data in
-            stderrData.append(data)
-        }, terminationHandler: { selfRef in
-            let standardOutput = stdoutData.value()
-            let standardError = stderrData.value()
-            
-            terminationHandler(selfRef, standardOutput, standardError)
-        })
-    }
-    
-    /// Waits for process to complete and all handlers to be called. Not to be
-    /// confused with `Process.waitUntilExit()` which can return before its
-    /// `terminationHandler` is called.
-    /// Calling this method when using the non-deprecated methods will return immediately and not wait for the process to exit.
-    @available(*, deprecated, message: "Use Swift Concurrency methods instead")
-    public func waitForTermination() {
-        group.wait()
-    }
-    
-    @available(*, deprecated, message: "Use Swift Concurrency methods instead")
-    private func createPipeWithReadabilityHandler(_ handler: @escaping @Sendable (Data) -> Void) -> Pipe {
-        let pipe = Pipe()
-        
-        group.enter()
-        
-        let stream: AsyncStream<Data> = AsyncStream { continuation in
-            pipe.fileHandleForReading.readabilityHandler = { handle in
-                let data = handle.availableData
-                
-                guard !data.isEmpty else {
-                    handle.readabilityHandler = nil
-                    continuation.finish()
-                    return
-                }
-                
-                continuation.yield(data)
-            }
-            
-            continuation.onTermination = { _ in
-                pipe.fileHandleForReading.readabilityHandler = nil
-            }
-        }
-        
-        Task {
-            for await data in stream {
-                handler(data)
-            }
-            
-            group.leave()
-        }
-        
-        return pipe
     }
 }

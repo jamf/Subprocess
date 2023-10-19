@@ -12,10 +12,9 @@ Subprocess is a Swift library for macOS providing interfaces for both synchronou
 SubprocessMocks can be used in unit tests for quick and highly customizable mocking and verification of Subprocess usage. 
 
 - [Usage](#usage)
-    - [Shell](#shell-class)
-        - [Input](#command-input) - [Data](#input-for-data), [Text](#input-for-text), [File](#input-for-file-url)
-        - [Output](#command-output) - [Data](#output-as-data), [Text](#output-as-string), [JSON](#output-as-json), [Decodable JSON object](#output-as-decodable-object-from-json), [Property list](#output-as-property-list), [Decodable property list object](#output-as-decodable-object-from-property-list)
-    - [Subprocess](#subprocess-class)
+    - [Subprocess Class](#subprocess-class)
+        - [Command Input](#command-input) - [Data](#input-for-data), [Text](#input-for-text), [File](#input-for-file-url)
+        - [Command Output](#command-output) - [Data](#output-as-data), [Text](#output-as-string), [Decodable JSON object](#output-as-decodable-object-from-json), [Decodable property list object](#output-as-decodable-object-from-property-list)
 - [Installation](#installation)
     - [SwiftPM](#swiftpm)
     - [Cocoapods](#cocoapods)
@@ -133,6 +132,34 @@ if process.exitCode == 0 {
 } else {
     // Handle failure
 }
+```
+###### Closure based callbacks
+```swift
+let command: [String] = ...
+let process = Subprocess(command)
+
+// The outputHandler and errorHandler are invoked serially
+try process.launch(outputHandler: { data in
+    // Handle new data read from stdout
+}, errorHandler: { data in
+    // Handle new data read from stderr
+}, terminationHandler: { process in
+    // Handle process termination, all scheduled calls to
+    // the outputHandler and errorHandler are guaranteed to
+    // have completed.
+})
+```
+###### Handing output on termination with a closure
+```swift
+let command: [String] = ...
+let process = Subprocess(command)
+
+try process.launch { (process, outputData, errorData) in
+    if process.exitCode == 0 {
+        // Do something with output data
+    } else {
+        // Handle failure
+    }
 ```
 
 ## Installation

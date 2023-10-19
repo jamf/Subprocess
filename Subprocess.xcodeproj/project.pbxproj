@@ -30,6 +30,7 @@
 		8F6AA3F82ADDA80000F86C7A /* AsyncSequence+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F6AA3F42ADDA80000F86C7A /* AsyncSequence+Additions.swift */; };
 		8F6AA3F92ADDA80000F86C7A /* Pipe+AsyncBytes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F6AA3F52ADDA80000F86C7A /* Pipe+AsyncBytes.swift */; };
 		8F6AA3FC2ADDA85C00F86C7A /* SubprocessSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F6AA3FA2ADDA85500F86C7A /* SubprocessSystemTests.swift */; };
+		8F95A1182AE1F8A3008958DD /* MockOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F95A1172AE1F8A3008958DD /* MockOutput.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,6 +82,7 @@
 		8F6AA3F42ADDA80000F86C7A /* AsyncSequence+Additions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AsyncSequence+Additions.swift"; sourceTree = "<group>"; };
 		8F6AA3F52ADDA80000F86C7A /* Pipe+AsyncBytes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Pipe+AsyncBytes.swift"; sourceTree = "<group>"; };
 		8F6AA3FA2ADDA85500F86C7A /* SubprocessSystemTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubprocessSystemTests.swift; sourceTree = "<group>"; };
+		8F95A1172AE1F8A3008958DD /* MockOutput.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockOutput.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -178,8 +180,9 @@
 				6EDDC6AD2410378100E171C6 /* MockSubprocess.swift */,
 				6EDDC6AE2410378100E171C6 /* MockShell.swift */,
 				6EDDC6AF2410378100E171C6 /* MockSubprocessDependencyBuilder.swift */,
-				6EDDC6B02410378100E171C6 /* Info.plist */,
 				6EDDC6B12410378100E171C6 /* MockProcess.swift */,
+				8F95A1172AE1F8A3008958DD /* MockOutput.swift */,
+				6EDDC6B02410378100E171C6 /* Info.plist */,
 			);
 			path = SubprocessMocks;
 			sourceTree = "<group>";
@@ -456,6 +459,7 @@
 			files = (
 				6EDDC6D9241037F500E171C6 /* MockShell.swift in Sources */,
 				6EDDC6DB241037F500E171C6 /* MockProcess.swift in Sources */,
+				8F95A1182AE1F8A3008958DD /* MockOutput.swift in Sources */,
 				6EDDC6D8241037F500E171C6 /* MockSubprocess.swift in Sources */,
 				6EDDC6DA241037F500E171C6 /* MockSubprocessDependencyBuilder.swift in Sources */,
 			);

@@ -4,6 +4,7 @@ import XCTest
 @testable import SubprocessMocks
 #endif
 
+// swiftlint:disable duplicated_key_in_dictionary_literal
 final class SubprocessTests: XCTestCase {
 
     let command = [ "/usr/local/bin/somefakeCommand", "foo", "bar" ]
@@ -50,9 +51,8 @@ final class SubprocessTests: XCTestCase {
 
         // Then
         switch input.value {
-        case .text(let text, let encoding):
+        case .text(let text):
             XCTAssertEqual(text, expected)
-            XCTAssertEqual(encoding, .utf8)
         default: XCTFail("Unexpected type")
         }
         guard let pipe = pipeOrFileHandle as? MockPipe else { return XCTFail("Unable to cast MockPipe") }
@@ -99,8 +99,8 @@ final class SubprocessTests: XCTestCase {
     }
 
     // MARK: PID
-
-    func testGetPID() {
+    
+    func testGetPID() throws {
         // Given
         let mockCalled = expectation(description: "Mock setup called")
         var expectedPID: Int32?
@@ -111,12 +111,11 @@ final class SubprocessTests: XCTestCase {
 
         // When
         let subprocess = Subprocess(command)
-        XCTAssertNoThrow(try subprocess.launch(terminationHandler: { (_, _, _) in }))
+        _ = try subprocess.run()
 
         // Then
-        waitForExpectations(timeout: 5.0) { _ in
-            XCTAssertEqual(subprocess.pid, expectedPID)
-        }
+        wait(for: [mockCalled], timeout: 5.0)
+        XCTAssertEqual(subprocess.pid, expectedPID)
     }
 
     // MARK: launch with termination handler
@@ -139,22 +138,54 @@ final class SubprocessTests: XCTestCase {
 
         // When
         let subprocess = Subprocess(command)
-        XCTAssertNoThrow(try subprocess.launch(terminationHandler: { (process, standardOutput, _) in
+        XCTAssertNoThrow(try subprocess.launch(terminationHandler: { (process, standardOutput, standardError) in
             XCTAssertEqual(standardOutput, expectedStdout)
-            XCTAssertEqual(standardOutput, expectedStdout)
+            XCTAssertEqual(standardError, expectedStderr)
             XCTAssertEqual(process.terminationReason, .uncaughtSignal)
             XCTAssertEqual(process.exitCode, expectedExitCode)
             terminationExpectation.fulfill()
         }))
 
         // Then
-        waitForExpectations(timeout: 5.0)
+        wait(for: [terminationExpectation], timeout: 5.0)
+        Subprocess.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
+    }
+    
+    func testRunhWithWaitUntilExit() async throws {
+        // Given
+        let expectedExitCode = Int32.random(in: Int32.min...Int32.max)
+        let expectedStdout = Data([ UInt8.random(in: 0...UInt8.max),
+                                    UInt8.random(in: 0...UInt8.max),
+                                    UInt8.random(in: 0...UInt8.max) ])
+        let expectedStderr = Data([ UInt8.random(in: 0...UInt8.max),
+                                    UInt8.random(in: 0...UInt8.max),
+                                    UInt8.random(in: 0...UInt8.max) ])
+        Subprocess.expect(command) { mock in
+            mock.writeTo(stdout: expectedStdout)
+            mock.writeTo(stderr: expectedStderr)
+            mock.exit(withStatus: expectedExitCode, reason: .uncaughtSignal)
+        }
+
+        // When
+        let subprocess = Subprocess(command)
+        let (standardOutput, standardError, waitUntilExit) = try subprocess.run()
+        async let (stdout, stderr) = (standardOutput, standardError)
+        let combinedOutput = await [stdout.data(), stderr.data()]
+        
+        await waitUntilExit()
+        
+        XCTAssertEqual(combinedOutput[0], expectedStdout)
+        XCTAssertEqual(combinedOutput[1], expectedStderr)
+        XCTAssertEqual(subprocess.terminationReason, .uncaughtSignal)
+        XCTAssertEqual(subprocess.exitCode, expectedExitCode)
+
+        // Then
         Subprocess.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
 
     // MARK: suspend
 
-    func testSuspend() {
+    func testSuspend() throws {
         // Given
         let semaphore = DispatchSemaphore(value: 0)
         let suspendCalled = expectation(description: "Suspend called")
@@ -166,7 +197,7 @@ final class SubprocessTests: XCTestCase {
             semaphore.signal()
         }
         let subprocess = Subprocess(command)
-        XCTAssertNoThrow(try subprocess.launch(terminationHandler: { (_, _, _) in }))
+        _ = try subprocess.run()
         semaphore.wait()
 
         // When
@@ -179,7 +210,7 @@ final class SubprocessTests: XCTestCase {
 
     // MARK: resume
 
-    func testResume() {
+    func testResume() throws {
         // Given
         let semaphore = DispatchSemaphore(value: 0)
         let resumeCalled = expectation(description: "Resume called")
@@ -191,7 +222,7 @@ final class SubprocessTests: XCTestCase {
             semaphore.signal()
         }
         let subprocess = Subprocess(command)
-        XCTAssertNoThrow(try subprocess.launch(terminationHandler: { (_, _, _) in }))
+        _ = try subprocess.run()
         semaphore.wait()
 
         // When
@@ -204,7 +235,7 @@ final class SubprocessTests: XCTestCase {
 
     // MARK: kill
 
-    func testKill() {
+    func testKill() throws {
         // Given
         let semaphore = DispatchSemaphore(value: 0)
         let terminateCalled = expectation(description: "Terminate called")
@@ -215,7 +246,7 @@ final class SubprocessTests: XCTestCase {
             semaphore.signal()
         }
         let subprocess = Subprocess(command)
-        XCTAssertNoThrow(try subprocess.launch(terminationHandler: { (_, _, _) in }))
+        _ = try subprocess.run()
         semaphore.wait()
 
         // When
@@ -240,4 +271,150 @@ final class SubprocessTests: XCTestCase {
         XCTAssertEqual(subprocess.environment?[environmentVariableName], environmentVariableValue,
                        "The environment property did not store the value correctly.")
     }
+    
+    // MARK: Data
+
+    func testReturningDataWhenExitCodeIsNoneZero() async {
+        // Given
+        let exitCode = Int32.random(in: 1...Int32.max)
+        let stdoutData = Data("stdout example".utf8)
+        let stderrData = Data("stderr example".utf8)
+        Subprocess.expect(command, standardOutput: stdoutData, standardError: stderrData, exitCode: exitCode)
+
+        // When
+        do {
+            _ = try await Subprocess.data(for: command)
+        } catch let Subprocess.Error.nonZeroExit(status: status, reason: _, standardOutput: stdout, standardError: stderr) {
+            XCTAssertEqual(status, exitCode)
+            XCTAssertTrue(stderr.contains("stderr example"))
+            XCTAssertEqual(stdoutData, stdout)
+        } catch {
+            XCTFail("Unexpected error type: \(error)")
+        }
+
+        // Then
+        Subprocess.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
+    }
+
+    func testReturningDataFromStandardOutput() async throws {
+        // Given
+        let expected = Data([ UInt8.random(in: 0...UInt8.max),
+                              UInt8.random(in: 0...UInt8.max),
+                              UInt8.random(in: 0...UInt8.max) ])
+        let errorData = Data([ UInt8.random(in: 0...UInt8.max) ])
+        Subprocess.expect(command, standardOutput: expected, standardError: errorData)
+
+        // When
+        let result = try await Subprocess.data(for: command)
+
+        // Then
+        XCTAssertEqual(expected, result)
+        Subprocess.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
+    }
+
+    func testReturningDataFromStandardError() async throws {
+        // Given
+        let expected = Data([ UInt8.random(in: 0...UInt8.max),
+                              UInt8.random(in: 0...UInt8.max),
+                              UInt8.random(in: 0...UInt8.max) ])
+        let stdOutData = Data([ UInt8.random(in: 0...UInt8.max) ])
+        Subprocess.expect(command, standardOutput: stdOutData, standardError: expected)
+
+        // When
+        let result = try await Subprocess.data(for: command, options: .returnStandardError)
+
+        // Then
+        XCTAssertEqual(expected, result)
+        Subprocess.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
+    }
+
+    // MARK: String
+
+    func testReturningStringWhenExitCodeIsNoneZero() async throws {
+        // Given
+        let exitCode = Int32.random(in: 1...Int32.max)
+        let stdoutText = "should not show up"
+        let stderrText = "should show up"
+        Subprocess.expect(command, standardOutput: stdoutText, standardError: stderrText, exitCode: exitCode)
+        
+        // When
+        do {
+            _ = try await Subprocess.string(for: command)
+        } catch let Subprocess.Error.nonZeroExit(status: status, reason: _, standardOutput: stdout, standardError: stderr) {
+            XCTAssertEqual(status, exitCode)
+            XCTAssertTrue(stderr.contains("should show up"))
+            XCTAssertEqual(stdoutText, String(decoding: stdout, as: UTF8.self))
+        } catch {
+            XCTFail("Unexpected error type: \(error)")
+        }
+
+        // Then
+        Subprocess.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
+    }
+
+    func testReturningStringFromStandardOutput() async throws {
+        // Given
+        let expected = UUID().uuidString
+        Subprocess.expect(command, standardOutput: expected, standardError: UUID().uuidString)
+
+        // When
+        let result = try await Subprocess.string(for: command)
+
+        // Then
+        XCTAssertEqual(expected, result)
+        Subprocess.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
+    }
+
+    func testReturningStringFromStandardError() async throws {
+        // Given
+        let expected = UUID().uuidString
+        Subprocess.expect(command, standardOutput: UUID().uuidString, standardError: expected)
+
+        // When
+        let result = try await Subprocess.string(for: command, options: .returnStandardError)
+
+        // Then
+        XCTAssertEqual(expected, result)
+        Subprocess.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
+    }
+
+    // MARK: JSON object
+
+    func testReturningJSONArray() async throws {
+        // Given
+        let expected: [String] = [
+            UUID().uuidString,
+            UUID().uuidString
+        ]
+        
+        XCTAssertNoThrow(try Subprocess.expect(command, content: expected, encoder: JSONEncoder()))
+
+        // When
+        let result: [String] = try await Subprocess.value(for: command, decoder: JSONDecoder())
+
+        // Then
+        XCTAssertEqual(expected, result)
+        Subprocess.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
+    }
+
+    func testExecReturningJSONDictionary() async throws {
+        // Given
+        let expected: [String: [String: String]] = [
+            UUID().uuidString: [
+                UUID().uuidString: UUID().uuidString
+            ],
+            UUID().uuidString: [
+                UUID().uuidString: UUID().uuidString
+            ]
+        ]
+        XCTAssertNoThrow(try Subprocess.expect(command, content: expected, encoder: JSONEncoder()))
+
+        // When
+        let result: [String: [String: String]] = try await Subprocess.value(for: command, decoder: JSONDecoder())
+
+        // Then
+        XCTAssertEqual(expected, result)
+        Subprocess.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
+    }
 }
+// swiftlint:enable duplicated_key_in_dictionary_literal

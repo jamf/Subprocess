@@ -4,7 +4,7 @@
 //
 //  MIT License
 //
-//  Copyright (c) 2018 Jamf Software
+//  Copyright (c) 2023 Jamf
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -38,28 +38,22 @@ public struct MockProcess {
 
     /// Writes given data to standard out of the mock child process
     /// - Parameter data: Data to write to standard out of the mock child process
-    public func writeTo(stdout data: Data) {
-        reference.standardOutputPipe?.fileHandleForWriting.write(data)
-    }
-
-    /// Writes given text to standard out of the mock child process
-    /// - Parameter text: Text to write to standard out of the mock child process
-    public func writeTo(stdout text: String, encoding: String.Encoding = .utf8) {
-        guard let data = text.data(using: encoding) else { return }
-        reference.standardOutputPipe?.fileHandleForWriting.write(data)
+    public func writeTo(stdout: some MockOutput) {
+        do {
+            try reference.standardOutputPipe?.fileHandleForWriting.write(contentsOf: stdout.data)
+        } catch {
+            fatalError("unexpected write failure: \(error)")
+        }
     }
 
     /// Writes given data to standard error of the mock child process
     /// - Parameter data: Data to write to standard error of the mock child process
-    public func writeTo(stderr data: Data) {
-        reference.standardErrorPipe?.fileHandleForWriting.write(data)
-    }
-
-    /// Writes given text to standard error of the mock child process
-    /// - Parameter text: Text to write to standard error of the mock child process
-    public func writeTo(stderr text: String, encoding: String.Encoding = .utf8) {
-        guard let data = text.data(using: encoding) else { return }
-        reference.standardErrorPipe?.fileHandleForWriting.write(data)
+    public func writeTo(stderr: some MockOutput) {
+        do {
+            try reference.standardErrorPipe?.fileHandleForWriting.write(contentsOf: stderr.data)
+        } catch {
+            fatalError("unexpected write failure: \(error)")
+        }
     }
 
     /// Completes the mock process execution
@@ -73,8 +67,6 @@ public struct MockProcess {
 
 /// Subclass of `Process` used for mocking
 open class MockProcessReference: Process {
-    // swiftlint:disable nesting
-
     /// Context information and values used for overriden properties
     public struct Context {
 
@@ -97,7 +89,6 @@ open class MockProcessReference: Process {
         var standardError: Any?
         var terminationHandler: (@Sendable (Process) -> Void)?
     }
-    // swiftlint:enable nesting
 
     public var context: Context
 
@@ -111,7 +102,7 @@ open class MockProcessReference: Process {
     /// - Parameter block: Block used to stub `Process.run`
     public init(withRunBlock block: @escaping (MockProcess) -> Void) {
         context = Context(runStub: { mock in
-            DispatchQueue.global(qos: .userInitiated).async {
+            Task(priority: .userInitiated) {
                 block(mock)
             }
         })
