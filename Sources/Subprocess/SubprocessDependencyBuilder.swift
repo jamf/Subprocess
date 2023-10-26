@@ -4,7 +4,7 @@
 //
 //  MIT License
 //
-//  Copyright (c) 2018 Jamf Software
+//  Copyright (c) 2023 Jamf
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -41,28 +41,37 @@ public protocol SubprocessDependencyFactory {
     /// - Returns: New FileHandle for reading
     /// - Throws: When unable to open file for reading
     func makeInputFileHandle(url: URL) throws -> FileHandle
-
-    /// Creates a Pipe and writes given data
+    
+    /// Creates a `Pipe` and writes the sequence.
     ///
-    /// - Parameter data: Data to write to the Pipe
-    /// - Returns: New Pipe instance
-    func makeInputPipe(data: Data) -> Pipe
+    /// - Parameter sequence: An `AsyncSequence` that supplies data to be written.
+    /// - Returns: New `Pipe` instance.
+    func makeInputPipe<Input>(sequence: Input) throws -> Pipe where Input : AsyncSequence, Input.Element == UInt8
 }
 
 /// Default implementation of SubprocessDependencyFactory
 public struct SubprocessDependencyBuilder: SubprocessDependencyFactory {
-
-    /// Shared instance used for dependency creatation
-    public static var shared: SubprocessDependencyFactory = SubprocessDependencyBuilder()
+    private static let queue = DispatchQueue(label: "\(Self.self)")
+    private static var _shared: any SubprocessDependencyFactory = SubprocessDependencyBuilder()
+    /// Shared instance used for dependency creation
+    public static var shared: any SubprocessDependencyFactory {
+        get {
+            queue.sync {
+                _shared
+            }
+        }
+        set {
+            queue.sync {
+                _shared = newValue
+            }
+        }
+    }
 
     public func makeProcess(command: [String]) -> Process {
         var tmp = command
         let process = Process()
-        if #available(OSX 10.13, *) {
-            process.executableURL = URL(fileURLWithPath: tmp.removeFirst())
-        } else {
-            process.launchPath = tmp.removeFirst()
-        }
+        
+        process.executableURL = URL(fileURLWithPath: tmp.removeFirst())
         process.arguments = tmp
         return process
     }
@@ -70,18 +79,33 @@ public struct SubprocessDependencyBuilder: SubprocessDependencyFactory {
     public func makeInputFileHandle(url: URL) throws -> FileHandle {
         return try FileHandle(forReadingFrom: url)
     }
-
-    public func makeInputPipe(data: Data) -> Pipe {
+    
+    public func makeInputPipe<Input>(sequence: Input) throws -> Pipe where Input : AsyncSequence, Input.Element == UInt8 {
         let pipe = Pipe()
+        // see here: https://developer.apple.com/forums/thread/690382
+        let result = fcntl(pipe.fileHandleForWriting.fileDescriptor, F_SETNOSIGPIPE, 1)
+        
+        guard result >= 0 else {
+            throw NSError(domain: NSPOSIXErrorDomain, code: Int(result), userInfo: nil)
+        }
+        
         pipe.fileHandleForWriting.writeabilityHandler = { handle in
-            handle.write(data)
             handle.writeabilityHandler = nil
-            if #available(OSX 10.15, *) {
-                try? handle.close()
-            } else {
-                handle.closeFile()
+
+            Task {
+                defer {
+                    try? handle.close()
+                }
+                
+                // `DispatchIO` seems like an interesting solution but doesn't seem to mesh well with async/await, perhaps there will be updates in this area in the future.
+                // https://developer.apple.com/forums/thread/690310
+                // According to Swift forum talk byte by byte reads _could_ be optimized by the compiler depending on how much visibility it has into methods.
+                for try await byte in sequence {
+                    try handle.write(contentsOf: [byte])
+                }
             }
         }
+        
         return pipe
     }
 }

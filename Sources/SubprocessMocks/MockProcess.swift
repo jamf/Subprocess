@@ -4,7 +4,7 @@
 //
 //  MIT License
 //
-//  Copyright (c) 2018 Jamf Software
+//  Copyright (c) 2023 Jamf
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -38,28 +38,22 @@ public struct MockProcess {
 
     /// Writes given data to standard out of the mock child process
     /// - Parameter data: Data to write to standard out of the mock child process
-    public func writeTo(stdout data: Data) {
-        reference.standardOutputPipe?.fileHandleForWriting.write(data)
-    }
-
-    /// Writes given text to standard out of the mock child process
-    /// - Parameter text: Text to write to standard out of the mock child process
-    public func writeTo(stdout text: String, encoding: String.Encoding = .utf8) {
-        guard let data = text.data(using: encoding) else { return }
-        reference.standardOutputPipe?.fileHandleForWriting.write(data)
+    public func writeTo(stdout: some MockOutput) {
+        do {
+            try reference.standardOutputPipe?.fileHandleForWriting.write(contentsOf: stdout.data)
+        } catch {
+            fatalError("unexpected write failure: \(error)")
+        }
     }
 
     /// Writes given data to standard error of the mock child process
     /// - Parameter data: Data to write to standard error of the mock child process
-    public func writeTo(stderr data: Data) {
-        reference.standardErrorPipe?.fileHandleForWriting.write(data)
-    }
-
-    /// Writes given text to standard error of the mock child process
-    /// - Parameter text: Text to write to standard error of the mock child process
-    public func writeTo(stderr text: String, encoding: String.Encoding = .utf8) {
-        guard let data = text.data(using: encoding) else { return }
-        reference.standardErrorPipe?.fileHandleForWriting.write(data)
+    public func writeTo(stderr: some MockOutput) {
+        do {
+            try reference.standardErrorPipe?.fileHandleForWriting.write(contentsOf: stderr.data)
+        } catch {
+            fatalError("unexpected write failure: \(error)")
+        }
     }
 
     /// Completes the mock process execution
@@ -73,8 +67,6 @@ public struct MockProcess {
 
 /// Subclass of `Process` used for mocking
 open class MockProcessReference: Process {
-    // swiftlint:disable nesting
-
     /// Context information and values used for overriden properties
     public struct Context {
 
@@ -95,19 +87,14 @@ open class MockProcessReference: Process {
         var standardInput: Any?
         var standardOutput: Any?
         var standardError: Any?
-#if compiler(>=5.7)
         var terminationHandler: (@Sendable (Process) -> Void)?
-#else
-        var terminationHandler: ((Process) -> Void)?
-#endif
     }
-    // swiftlint:enable nesting
 
     public var context: Context
 
     /// Creates a new `MockProcessReference` which throws an error on launch
     /// - Parameter error: Error thrown when `Process.run` is called
-    public init(withRunError error: Error) {
+    public init(withRunError error: any Error) {
         context = Context(runStub: { _ in throw error })
     }
 
@@ -115,7 +102,7 @@ open class MockProcessReference: Process {
     /// - Parameter block: Block used to stub `Process.run`
     public init(withRunBlock block: @escaping (MockProcess) -> Void) {
         context = Context(runStub: { mock in
-            DispatchQueue.global(qos: .userInitiated).async {
+            Task(priority: .userInitiated) {
                 block(mock)
             }
         })
@@ -129,6 +116,9 @@ open class MockProcessReference: Process {
 
     /// Block called when `Process.suspend` is called
     public var stubSuspend: (() -> Bool)?
+    
+    /// Block called when `Process.waitUntilExit` is called
+    public var stubWaitUntilExit: (() -> Void)?
 
     /// standardOutput object as a Pipe
     public var standardOutputPipe: Pipe? { standardOutput as? Pipe }
@@ -155,13 +145,8 @@ open class MockProcessReference: Process {
         guard context.state == .running else { return }
         context.state = (reason == .exit) ? .exited : .uncaughtSignal
         context.terminationStatus = statusCode
-        if #available(OSX 10.15, *) {
-            try? standardOutputPipe?.fileHandleForWriting.close()
-            try? standardErrorPipe?.fileHandleForWriting.close()
-        } else {
-            standardOutputPipe?.fileHandleForWriting.closeFile()
-            standardErrorPipe?.fileHandleForWriting.closeFile()
-        }
+        try? standardOutputPipe?.fileHandleForWriting.close()
+        try? standardErrorPipe?.fileHandleForWriting.close()
 
         guard let handler = terminationHandler else { return }
         terminationHandler = nil
@@ -189,6 +174,7 @@ open class MockProcessReference: Process {
     open override func terminate() {
         if let stub = stubTerminate {
             stub(self)
+            context.state = .exited
         } else {
             context.state = .uncaughtSignal
         }
@@ -209,19 +195,16 @@ open class MockProcessReference: Process {
         set { context.standardError = newValue }
     }
 
-#if compiler(>=5.7)
     open override var terminationHandler: (@Sendable (Process) -> Void)? {
         get { context.terminationHandler }
         set { context.terminationHandler = newValue }
     }
-#else
-    open override var terminationHandler: ((Process) -> Void)? {
-        get { context.terminationHandler }
-        set { context.terminationHandler = newValue }
-    }
-#endif
 
     open override func resume() -> Bool { stubResume?() ?? false }
 
     open override func suspend() -> Bool { stubSuspend?() ?? false }
+    
+    open override func waitUntilExit() {
+        stubWaitUntilExit?()
+    }
 }

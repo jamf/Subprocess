@@ -1,5 +1,5 @@
 //
-//  Subprocess.h
+//  UnsafeData.swift
 //  Subprocess
 //
 //  MIT License
@@ -25,10 +25,21 @@
 //  SOFTWARE.
 //
 
-#import <Foundation/Foundation.h>
+import Foundation
 
-//! Project version number for Subprocess.
-FOUNDATION_EXPORT double SubprocessVersionNumber;
-
-//! Project version string for Subprocess.
-FOUNDATION_EXPORT const unsigned char SubprocessVersionString[];
+// Avoids errors for modifying data in concurrent contexts when we know it's safe to do so.
+final class UnsafeData: @unchecked Sendable {
+    private lazy var data = Data()
+    
+    func set(_ data: Data) {
+        self.data = data
+    }
+    
+    func append(_ other: Data) {
+        data.append(other)
+    }
+    
+    func value() -> Data {
+        data
+    }
+}

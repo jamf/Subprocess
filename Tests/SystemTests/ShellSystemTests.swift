@@ -1,6 +1,7 @@
 import XCTest
 @testable import Subprocess
 
+@available(*, deprecated, message: "Swift Concurrency methods in Subprocess replace Shell")
 final class ShellSystemTests: XCTestCase {
 
     override func setUp() {
@@ -73,7 +74,7 @@ final class ShellSystemTests: XCTestCase {
         var result: [[String: Any]]?
 
         // When
-        XCTAssertNoThrow(result = try Shell(["/usr/bin/log", "show", "--style", "json", "--last", "5m"]).execJSON())
+        XCTAssertNoThrow(result = try Shell(["/usr/bin/log", "show", "--style", "json", "--last", "1m"]).execJSON())
 
         // Then
         XCTAssertFalse(result?.isEmpty ?? true)
@@ -106,7 +107,7 @@ final class ShellSystemTests: XCTestCase {
             var machTimestamp: UInt64
         }
         var result: [LogMessage]?
-        let cmd = ["/usr/bin/log", "show", "--style", "json", "--last", "5m"]
+        let cmd = ["/usr/bin/log", "show", "--style", "json", "--last", "1m"]
         // When
         XCTAssertNoThrow(result = try Shell(cmd).exec(decoder: JSONDecoder()))
 

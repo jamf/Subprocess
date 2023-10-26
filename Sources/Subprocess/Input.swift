@@ -4,7 +4,7 @@
 //
 //  MIT License
 //
-//  Copyright (c) 2018 Jamf Software
+//  Copyright (c) 2023 Jamf
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,6 @@ import Foundation
 
 /// Interface representing input to the process
 public struct Input {
-
     /// Reference to the input value
     public enum Value {
 
@@ -36,7 +35,7 @@ public struct Input {
         case data(Data)
 
         /// Text to be written to stdin of the child process
-        case text(String, String.Encoding)
+        case text(String)
 
         /// File to be written to stdin of the child process
         case file(URL)
@@ -55,8 +54,8 @@ public struct Input {
     /// Creates input for writing text to stdin of the child process
     /// - Parameter text: Text written to stdin of the child process
     /// - Returns: New Input instance
-    public static func text(_ text: String, encoding: String.Encoding = .utf8) -> Input {
-        return Input(value: .text(text, encoding))
+    public static func text(_ text: String) -> Input {
+        return Input(value: .text(text))
     }
 
     /// Creates input for writing contents of file at path to stdin of the child process
@@ -78,10 +77,15 @@ public struct Input {
     func createPipeOrFileHandle() throws -> Any {
         switch value {
         case .data(let data):
-            return SubprocessDependencyBuilder.shared.makeInputPipe(data: data)
-        case .text(let text, let encoding):
-            guard let data = text.data(using: encoding) else { throw SubprocessError.inputStringEncodingError }
-            return SubprocessDependencyBuilder.shared.makeInputPipe(data: data)
+            return try SubprocessDependencyBuilder.shared.makeInputPipe(sequence: AsyncStream(UInt8.self, { continuation in
+                continuation.yield(data)
+                continuation.finish()
+            }))
+        case .text(let text):
+            return try SubprocessDependencyBuilder.shared.makeInputPipe(sequence: AsyncStream(UInt8.self, { continuation in
+                continuation.yield(Data(text.utf8))
+                continuation.finish()
+            }))
         case .file(let url):
             return try SubprocessDependencyBuilder.shared.makeInputFileHandle(url: url)
         }

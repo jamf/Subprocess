@@ -4,7 +4,7 @@
 //
 //  MIT License
 //
-//  Copyright (c) 2018 Jamf Software
+//  Copyright (c) 2023 Jamf
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -30,8 +30,10 @@ import Foundation
 import Subprocess
 #endif
 
+@available(*, deprecated, message: "Swift Concurrency methods in Subprocess replace Shell")
 extension Shell: SubprocessMockObject {}
 
+@available(*, deprecated, message: "Swift Concurrency methods in Subprocess replace Shell")
 public extension Shell {
 
     /// Adds a mock for a command which throws an error when `Process.run` is called
@@ -39,7 +41,7 @@ public extension Shell {
     /// - Parameters:
     ///     - command: The command to mock
     ///     - error: Error thrown when `Process.run` is called
-    static func stub(_ command: [String], error: Error) {
+    static func stub(_ command: [String], error: any Error) {
         Subprocess.stub(command, error: error)
     }
 
@@ -171,7 +173,7 @@ public extension Shell {
     ///     - line: Line number of source file where expect was called (Default: #line)
     static func expect(_ command: [String],
                        input: Input? = nil,
-                       error: Error,
+                       error: any Swift.Error,
                        file: StaticString = #file,
                        line: UInt = #line) {
         Subprocess.expect(command, input: input, error: error, file: file, line: line)

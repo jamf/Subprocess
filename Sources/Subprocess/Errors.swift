@@ -4,7 +4,7 @@
 //
 //  MIT License
 //
-//  Copyright (c) 2018 Jamf Software
+//  Copyright (c) 2023 Jamf
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@
 import Foundation
 
 /// Type representing possible errors
+@available(*, deprecated, message: "This type is no longer used with non-deprecated methods")
 public enum SubprocessError: Error {
 
     /// The process completed with a non-zero exit code
@@ -47,15 +48,16 @@ public enum SubprocessError: Error {
     case outputStringEncodingError
 }
 
+@available(*, deprecated, message: "This type is no longer used with non-deprecated methods")
 extension SubprocessError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .exitedWithNonZeroStatus(_, let errorMessage):
             return "\(errorMessage)"
-        case .unexpectedPropertyListObject(_):
+        case .unexpectedPropertyListObject:
             // Ignoring the plist contents parameter as we don't want that in the error message
             return "The property list object could not be cast to expected type"
-        case .unexpectedJSONObject(_):
+        case .unexpectedJSONObject:
             // Ignoring the json contents parameter as we don't want that in the error message
             return "The JSON object could not be cast to expected type"
         case .inputStringEncodingError:
@@ -67,6 +69,7 @@ extension SubprocessError: LocalizedError {
 }
 
 /// Common NSError methods for better interop with Objective-C
+@available(*, deprecated, message: "This type is no longer used with non-deprecated methods")
 extension SubprocessError: CustomNSError {
     public var errorCode: Int {
         switch self {

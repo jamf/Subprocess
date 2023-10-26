@@ -4,7 +4,7 @@
 //
 //  MIT License
 //
-//  Copyright (c) 2018 Jamf Software
+//  Copyright (c) 2023 Jamf
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -70,8 +70,21 @@ public class MockFileHandle: FileHandle {
     public var url: URL?
 }
 
-public class MockPipe: Pipe {
-    public var data: Data?
+public final class MockPipe: Pipe {
+    private static let queue = DispatchQueue(label: "\(MockPipe.self)")
+    private var _data: Data?
+    public var data: Data? {
+        get {
+            Self.queue.sync {
+                _data
+            }
+        }
+        set {
+            Self.queue.sync {
+                _data = newValue
+            }
+        }
+    }
 }
 
 class MockSubprocessDependencyBuilder {
@@ -83,11 +96,8 @@ class MockSubprocessDependencyBuilder {
         var process: MockProcessReference
         var file: StaticString?
         var line: UInt?
-        init(command: [String],
-             input: Input?,
-             process: MockProcessReference,
-             file: StaticString?,
-             line: UInt?) {
+        
+        init(command: [String], input: Input?, process: MockProcessReference, file: StaticString?, line: UInt?) {
             self.command = command
             self.input = input
             self.process = process
@@ -107,11 +117,7 @@ class MockSubprocessDependencyBuilder {
         mocks.append(mock)
     }
 
-    func expect(_ command: [String],
-                input: Input?,
-                process: MockProcessReference,
-                file: StaticString,
-                line: UInt) {
+    func expect(_ command: [String], input: Input?, process: MockProcessReference, file: StaticString, line: UInt) {
         let mock = MockItem(command: command, input: input, process: process, file: file, line: line)
         mocks.append(mock)
     }
@@ -129,12 +135,13 @@ class MockSubprocessDependencyBuilder {
             // Check the expected input
             let expectedData: Data?
             let expectedFile: URL?
+            
             switch $0.input?.value {
             case .data(let data):
                 expectedData = data
                 expectedFile = nil
-            case .text(let string, let encoding):
-                expectedData = string.data(using: encoding)
+            case .text(let string):
+                expectedData = Data(string.utf8)
                 expectedFile = nil
             case .file(let url):
                 expectedData = nil
@@ -234,10 +241,17 @@ extension MockSubprocessDependencyBuilder: SubprocessDependencyFactory {
         handle.url = url
         return handle
     }
-
-    func makeInputPipe(data: Data) -> Pipe {
+    
+    func makeInputPipe<Input>(sequence: Input) throws -> Pipe where Input : AsyncSequence, Input.Element == UInt8 {
+        let semaphore = DispatchSemaphore(value: 0)
         let pipe = MockPipe()
-        pipe.data = data
+        
+        Task {
+            pipe.data = try await sequence.data()
+            semaphore.signal()
+        }
+        
+        semaphore.wait()
         return pipe
     }
 }

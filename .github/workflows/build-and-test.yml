@@ -13,8 +13,10 @@ on:
 jobs:
   spm:
     name: SwiftPM build and test
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
+    - run: |
+        sudo xcode-select -s /Applications/Xcode_15.0.app
     - uses: actions/checkout@v3
     - name: Build swift packages
       run: swift build -v
@@ -22,8 +24,10 @@ jobs:
       run: swift test -v
   carthage:
     name: Xcode project build and test
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
+    - run: |
+        sudo xcode-select -s /Applications/Xcode_15.0.app
     - uses: actions/checkout@v3
     - name: Build xcode project
       run: xcodebuild build -scheme 'SubprocessMocks' -derivedDataPath .build
@@ -31,8 +35,10 @@ jobs:
       run: xcodebuild test -scheme 'Subprocess' -derivedDataPath .build
   cocoapods:
     name: Pod lib lint
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
+    - run: |
+        sudo xcode-select -s /Applications/Xcode_15.0.app
     - uses: actions/checkout@v3
     - name: Lib lint
-      run: pod lib lint --verbose Subprocess.podspec
+      run: pod lib lint --verbose Subprocess.podspec --allow-warnings

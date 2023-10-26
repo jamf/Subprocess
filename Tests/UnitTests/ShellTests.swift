@@ -9,7 +9,8 @@ struct TestCodableObject: Codable, Equatable {
     init() { uuid = UUID() }
 }
 
-// swiftlint:disable control_statement
+// swiftlint:disable control_statement duplicated_key_in_dictionary_literal
+@available(*, deprecated, message: "Swift Concurrency methods in Subprocess replace Shell")
 final class ShellTests: XCTestCase {
 
     let command = [ "/usr/local/bin/somefakeCommand", "foo", "bar" ]
@@ -354,4 +355,4 @@ final class ShellTests: XCTestCase {
         Shell.verify { XCTFail($0.message, file: $0.file, line: $0.line) }
     }
 }
-// swiftlint:enable control_statement
+// swiftlint:enable control_statement duplicated_key_in_dictionary_literal

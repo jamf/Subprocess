@@ -1,11 +1,23 @@
 ## Subprocess
 
-Subprocess is a Swift library for macOS providing interfaces for both synchronous and asynchronous process execution. 
+Subprocess is a Swift library for macOS providing interfaces for external process execution. 
 
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## 3.0.0 - 2023-10-13
+
+### Added
+- Methods to `Subprocess` that support Swift Concurrency.
+- `Subprocess.run(standardInput:options:)` can run interactive commands.
+
+### Changed 
+- Breaking: `Subprocess.init` no longer accepts an argument for a dispatch queue's quality of service since the underlying implementation now uses Swift Concurrency and not GCD.
+- Breaking: `Input`s `text` case no longer accepts an encoding as utf8 is overwhelmingly common. Instead convert the string to data explicitly if an alternate encoding is required.
+- `Shell` and `SubprocessError` have been deprecated in favor of using new replacement methods that support Swift Concurrency and that no longer have a synchronized wait.
+- Swift 5.9 (Xcode 15) is now the package minimum required to build.
 
 ## 2.0.0 - 2021-07-01
 

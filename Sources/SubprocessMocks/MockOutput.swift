@@ -1,6 +1,6 @@
 //
-//  Subprocess.h
-//  Subprocess
+//  MockOutput.swift
+//  SubprocessMocks
 //
 //  MIT License
 //
@@ -25,10 +25,21 @@
 //  SOFTWARE.
 //
 
-#import <Foundation/Foundation.h>
+import Foundation
 
-//! Project version number for Subprocess.
-FOUNDATION_EXPORT double SubprocessVersionNumber;
+/// A way to supply data to mock methods
+public protocol MockOutput {
+    var data: Data { get }
+}
 
-//! Project version string for Subprocess.
-FOUNDATION_EXPORT const unsigned char SubprocessVersionString[];
+extension Data: MockOutput {
+    public var data: Data {
+        self
+    }
+}
+
+extension String: MockOutput {
+    public var data: Data {
+        Data(self.utf8)
+    }
+}

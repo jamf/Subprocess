@@ -1,5 +1,5 @@
 //
-//  Subprocess.h
+//  AsyncSequence+Additions.swift
 //  Subprocess
 //
 //  MIT License
@@ -25,10 +25,26 @@
 //  SOFTWARE.
 //
 
-#import <Foundation/Foundation.h>
+import Foundation
 
-//! Project version number for Subprocess.
-FOUNDATION_EXPORT double SubprocessVersionNumber;
+extension AsyncSequence {
+    /// Returns a sequence of all the elements.
+    public func sequence() async rethrows -> [Element] {
+        try await reduce(into: [Element]()) { $0.append($1) }
+    }
+}
 
-//! Project version string for Subprocess.
-FOUNDATION_EXPORT const unsigned char SubprocessVersionString[];
+extension AsyncSequence where Element == UInt8 {
+    /// Returns a `Data` representation.
+    public func data() async rethrows -> Data {
+        Data(try await sequence())
+    }
+    
+    public func string() async rethrows -> String {
+        if #available(macOS 12.0, *) {
+            String(try await characters.sequence())
+        } else {
+            String(decoding: try await data(), as: UTF8.self)
+        }
+    }
+}
