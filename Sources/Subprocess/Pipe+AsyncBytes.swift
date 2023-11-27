@@ -31,7 +31,7 @@ import Foundation
 // We can avoid this problem if we create independent handlers.
 extension Pipe {
     /// Convenience for reading bytes from the pipe's file handle.
-    public struct AsyncBytes: AsyncSequence {
+    public struct AsyncBytes: AsyncSequence, Sendable {
         public typealias Element = UInt8
 
         let pipe: Pipe
