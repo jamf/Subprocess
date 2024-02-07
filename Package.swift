@@ -2,6 +2,19 @@
 
 import PackageDescription
 
+#if swift(<6)
+let swiftSettings: [SwiftSetting] = [
+    .enableUpcomingFeature("StrictConcurrency"),
+    .enableUpcomingFeature("ExistentialAny"),
+    .enableUpcomingFeature("ForwardTrailingClosures"),
+    .enableUpcomingFeature("ImplicitOpenExistentials"),
+    .enableUpcomingFeature("BareSlashRegexLiterals"),
+    .enableUpcomingFeature("ConciseMagicFile"),
+]
+#else
+let swiftSettings: [SwiftSetting] = []
+#endif
+
 let package = Package(
     name: "Subprocess",
     platforms: [ .macOS("10.15.4") ],
@@ -33,26 +46,30 @@ let package = Package(
     targets: [
         .target(
             name: "Subprocess",
-            dependencies: []
+            dependencies: [],
+            swiftSettings: swiftSettings
         ),
         .target(
             name: "SubprocessMocks",
             dependencies: [
                 .target(name: "Subprocess")
-            ]
+            ],
+            swiftSettings: swiftSettings
         ),
         .testTarget(
             name: "UnitTests",
             dependencies: [
                 .target(name: "Subprocess"),
                 .target(name: "SubprocessMocks")
-            ]
+            ],
+            swiftSettings: swiftSettings
         ),
         .testTarget(
             name: "SystemTests",
             dependencies: [
                 .target(name: "Subprocess")
-            ]
+            ],
+            swiftSettings: swiftSettings
         )
     ]
 )
