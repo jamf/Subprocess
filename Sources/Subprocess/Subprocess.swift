@@ -29,7 +29,7 @@ import Foundation
 import Combine
 
 /// Class used for asynchronous process execution
-open class Subprocess: @unchecked Sendable {
+public class Subprocess: @unchecked Sendable {
     /// Output options.
     public struct OutputOptions: OptionSet {
         public let rawValue: Int
@@ -240,7 +240,7 @@ open class Subprocess: @unchecked Sendable {
 // Methods for typical one-off acquisition of output from running some command.
 extension Subprocess {
     /// Additional configuration options.
-    public struct RunOptions: OptionSet {
+    public struct RunOptions: OptionSet, Sendable {
         public let rawValue: Int
 
         /// Throw an error if the process exited with a non-zero exit code.
@@ -259,7 +259,7 @@ extension Subprocess {
     ///   - command: An external command to run with optional arguments.
     ///   - standardInput: A type conforming to `DataProtocol` (typically a `Data` type) from which to read input to the external command.
     ///   - options: Options used to specify runtime behavior.
-    public static func data(for command: [String], standardInput: (any DataProtocol)? = nil, options: RunOptions = .throwErrorOnNonZeroExit) async throws -> Data {
+    public static func data(for command: [String], standardInput: (any DataProtocol & Sendable)? = nil, options: RunOptions = .throwErrorOnNonZeroExit) async throws -> Data {
         let subprocess = Self(command)
         let (standardOutput, standardError, waitForExit) = if let standardInput {
             try subprocess.run(standardInput: AsyncStream(UInt8.self, { continuation in
@@ -422,7 +422,7 @@ extension Subprocess {
     ///   - standardInput: A type conforming to `DataProtocol` (typically a `Data` type) from which to read input to the external command.
     ///   - options: Options used to specify runtime behavior.
     @inlinable
-    public static func string(for command: [String], standardInput: (any DataProtocol)? = nil, options: RunOptions = .throwErrorOnNonZeroExit) async throws -> String {
+    public static func string(for command: [String], standardInput: (any DataProtocol & Sendable)? = nil, options: RunOptions = .throwErrorOnNonZeroExit) async throws -> String {
         String(decoding: try await data(for: command, standardInput: standardInput, options: options), as: UTF8.self)
     }
     
@@ -455,7 +455,7 @@ extension Subprocess {
     ///   - options: Options used to specify runtime behavior.
     ///   - decoder: A `TopLevelDecoder` that will be used to decode the data.
     @inlinable
-    public static func value<Content, Decoder>(for command: [String], standardInput: (any DataProtocol)? = nil, options: RunOptions = .throwErrorOnNonZeroExit, decoder: Decoder) async throws -> Content where Content : Decodable, Decoder : TopLevelDecoder, Decoder.Input == Data {
+    public static func value<Content, Decoder>(for command: [String], standardInput: (any DataProtocol & Sendable)? = nil, options: RunOptions = .throwErrorOnNonZeroExit, decoder: Decoder) async throws -> Content where Content : Decodable, Decoder : TopLevelDecoder, Decoder.Input == Data {
         try await decoder.decode(Content.self, from: data(for: command, standardInput: standardInput, options: options))
     }
     
