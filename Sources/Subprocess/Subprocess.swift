@@ -31,7 +31,7 @@ import Combine
 /// Class used for asynchronous process execution
 public class Subprocess: @unchecked Sendable {
     /// Output options.
-    public struct OutputOptions: OptionSet {
+    public struct OutputOptions: OptionSet, Sendable {
         public let rawValue: Int
         
         /// Buffer standard output.
@@ -118,7 +118,7 @@ public class Subprocess: @unchecked Sendable {
     ///
     /// It is the callers responsibility to ensure that any reads occur if waiting for the process to exit otherwise a deadlock can happen if the process is waiting to write to its output buffer.
     /// A task group can be used to wait for exit while reading the output. If the output is discardable consider passing (`[]`) an empty set for the options which effectively flushes output to null.
-    public func run(options: OutputOptions = [.standardOutput, .standardError]) throws -> (standardOutput: Pipe.AsyncBytes, standardError: Pipe.AsyncBytes, waitUntilExit: () async -> Void) {
+    public func run(options: OutputOptions = [.standardOutput, .standardError]) throws -> (standardOutput: Pipe.AsyncBytes, standardError: Pipe.AsyncBytes, waitUntilExit: @Sendable () async -> Void) {
         let standardOutput: Pipe.AsyncBytes = {
             if options.contains(.standardOutput) {
                 let pipe = Pipe()
@@ -162,7 +162,7 @@ public class Subprocess: @unchecked Sendable {
                 }
             }
         }
-        let waitUntilExit = {
+        let waitUntilExit = { @Sendable in
             await task.value
         }
         
@@ -216,7 +216,7 @@ public class Subprocess: @unchecked Sendable {
     ///         }
     ///     }
     ///
-    public func run<Input>(standardInput: Input, options: OutputOptions = [.standardOutput, .standardError]) throws -> (standardOutput: Pipe.AsyncBytes, standardError: Pipe.AsyncBytes, waitUntilExit: () async -> Void) where Input : AsyncSequence, Input.Element == UInt8 {
+    public func run<Input>(standardInput: Input, options: OutputOptions = [.standardOutput, .standardError]) throws -> (standardOutput: Pipe.AsyncBytes, standardError: Pipe.AsyncBytes, waitUntilExit: @Sendable () async -> Void) where Input : AsyncSequence, Input.Element == UInt8 {
         process.standardInput = try SubprocessDependencyBuilder.shared.makeInputPipe(sequence: standardInput)
         return try run(options: options)
     }

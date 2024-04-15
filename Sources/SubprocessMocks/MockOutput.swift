@@ -28,7 +28,7 @@
 import Foundation
 
 /// A way to supply data to mock methods
-public protocol MockOutput {
+public protocol MockOutput: Sendable {
     var data: Data { get }
 }
 

@@ -103,7 +103,7 @@ final class SubprocessTests: XCTestCase {
     func testGetPID() throws {
         // Given
         let mockCalled = expectation(description: "Mock setup called")
-        var expectedPID: Int32?
+        nonisolated(unsafe) var expectedPID: Int32?
         Subprocess.expect(command) { mock in
             expectedPID = mock.reference.processIdentifier
             mockCalled.fulfill()
@@ -185,7 +185,7 @@ final class SubprocessTests: XCTestCase {
 
     // MARK: suspend
 
-    func testSuspend() throws {
+    @MainActor func testSuspend() throws {
         // Given
         let semaphore = DispatchSemaphore(value: 0)
         let suspendCalled = expectation(description: "Suspend called")
@@ -210,7 +210,7 @@ final class SubprocessTests: XCTestCase {
 
     // MARK: resume
 
-    func testResume() throws {
+    @MainActor func testResume() throws {
         // Given
         let semaphore = DispatchSemaphore(value: 0)
         let resumeCalled = expectation(description: "Resume called")
@@ -235,7 +235,7 @@ final class SubprocessTests: XCTestCase {
 
     // MARK: kill
 
-    func testKill() throws {
+    @MainActor func testKill() throws {
         // Given
         let semaphore = DispatchSemaphore(value: 0)
         let terminateCalled = expectation(description: "Terminate called")

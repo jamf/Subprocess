@@ -137,12 +137,16 @@ if process.exitCode == 0 {
 ```swift
 let command: [String] = ...
 let process = Subprocess(command)
+nonisolated(unsafe) var outputData: Data?
+nonisolated(unsafe) var errorData: Data?
 
 // The outputHandler and errorHandler are invoked serially
 try process.launch(outputHandler: { data in
     // Handle new data read from stdout
+    outputData = data 
 }, errorHandler: { data in
     // Handle new data read from stderr
+    errorData = data
 }, terminationHandler: { process in
     // Handle process termination, all scheduled calls to
     // the outputHandler and errorHandler are guaranteed to

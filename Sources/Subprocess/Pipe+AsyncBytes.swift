@@ -38,7 +38,7 @@ extension Pipe {
 
         public func makeAsyncIterator() -> AsyncStream<Element>.Iterator {
             AsyncStream { continuation in
-                pipe.fileHandleForReading.readabilityHandler = { handle in
+                pipe.fileHandleForReading.readabilityHandler = { @Sendable handle in
                     let availableData = handle.availableData
                     
                     guard !availableData.isEmpty else {

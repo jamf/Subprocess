@@ -32,7 +32,7 @@ import Foundation
 public class Shell {
 
     /// OptionSet representing output handling
-    public struct OutputOptions: OptionSet {
+    public struct OutputOptions: OptionSet, Sendable {
         public let rawValue: Int
 
         /// Processes data written to stdout
