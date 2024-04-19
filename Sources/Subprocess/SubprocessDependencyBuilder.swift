@@ -52,7 +52,7 @@ public protocol SubprocessDependencyFactory {
 /// Default implementation of SubprocessDependencyFactory
 public struct SubprocessDependencyBuilder: SubprocessDependencyFactory {
     private static let queue = DispatchQueue(label: "\(Self.self)")
-    private static var _shared: any SubprocessDependencyFactory = SubprocessDependencyBuilder()
+    nonisolated(unsafe) private static var _shared: any SubprocessDependencyFactory = SubprocessDependencyBuilder()
     /// Shared instance used for dependency creation
     public static var shared: any SubprocessDependencyFactory {
         get {
@@ -80,7 +80,7 @@ public struct SubprocessDependencyBuilder: SubprocessDependencyFactory {
         return try FileHandle(forReadingFrom: url)
     }
     
-    public func makeInputPipe<Input>(sequence: Input) throws -> Pipe where Input : AsyncSequence, Input.Element == UInt8 {
+    public func makeInputPipe<Input>(sequence: Input) throws -> Pipe where Input : AsyncSequence & Sendable, Input.Element == UInt8 {
         let pipe = Pipe()
         // see here: https://developer.apple.com/forums/thread/690382
         let result = fcntl(pipe.fileHandleForWriting.fileDescriptor, F_SETNOSIGPIPE, 1)

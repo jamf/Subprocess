@@ -31,7 +31,7 @@ import Subprocess
 #endif
 
 /// Interface used for mocking a process
-public struct MockProcess {
+public struct MockProcess: Sendable {
 
     /// The underlying `MockProcessReference`
     public var reference: MockProcessReference
@@ -100,7 +100,7 @@ open class MockProcessReference: Process {
 
     /// Creates a new `MockProcessReference` calling run stub block
     /// - Parameter block: Block used to stub `Process.run`
-    public init(withRunBlock block: @escaping (MockProcess) -> Void) {
+    public init(withRunBlock block: @escaping @Sendable (MockProcess) -> Void) {
         context = Context(runStub: { mock in
             Task(priority: .userInitiated) {
                 block(mock)

@@ -88,7 +88,6 @@ public final class MockPipe: Pipe {
 }
 
 class MockSubprocessDependencyBuilder {
-
     class MockItem {
         var used = false
         var command: [String]
@@ -108,7 +107,7 @@ class MockSubprocessDependencyBuilder {
 
     var mocks: [MockItem] = []
 
-    static let shared = MockSubprocessDependencyBuilder()
+    nonisolated(unsafe) static let shared = MockSubprocessDependencyBuilder()
 
     init() { SubprocessDependencyBuilder.shared = self }
 
@@ -242,7 +241,7 @@ extension MockSubprocessDependencyBuilder: SubprocessDependencyFactory {
         return handle
     }
     
-    func makeInputPipe<Input>(sequence: Input) throws -> Pipe where Input : AsyncSequence, Input.Element == UInt8 {
+    func makeInputPipe<Input>(sequence: Input) throws -> Pipe where Input : AsyncSequence & Sendable, Input.Element == UInt8 {
         let semaphore = DispatchSemaphore(value: 0)
         let pipe = MockPipe()
         

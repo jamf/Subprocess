@@ -51,7 +51,7 @@ public extension Subprocess {
     /// - Parameters:
     ///     - command: The command to mock
     ///     - runBlock: Block called with a `MockProcess` to mock process execution.
-    static func stub(_ command: [String], runBlock: ((MockProcess) -> Void)? = nil) {
+    static func stub(_ command: [String], runBlock: (@Sendable (MockProcess) -> Void)? = nil) {
         let mock = MockProcessReference(withRunBlock: runBlock ?? { $0.exit() })
         MockSubprocessDependencyBuilder.shared.stub(command, process: mock)
     }
@@ -116,7 +116,7 @@ public extension Subprocess {
     ///     - file: Source file where expect was called (Default: #file)
     ///     - line: Line number of source file where expect was called (Default: #line)
     ///     - runBlock: Block called with a `MockProcess` to mock process execution
-    static func expect(_ command: [String], input: Input? = nil, file: StaticString = #file, line: UInt = #line, runBlock: ((MockProcess) -> Void)? = nil) {
+    static func expect(_ command: [String], input: Input? = nil, file: StaticString = #file, line: UInt = #line, runBlock: (@Sendable (MockProcess) -> Void)? = nil) {
         let mock = MockProcessReference(withRunBlock: runBlock ?? { $0.exit() })
         MockSubprocessDependencyBuilder.shared.expect(command, input: input, process: mock, file: file, line: line)
     }

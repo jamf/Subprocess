@@ -86,7 +86,7 @@ final class SubprocessSystemTests: XCTestCase {
                 switch line {
                 case "hello":
                     Task {
-                        input.yield("world\n")
+                        _ = input.yield("world\n")
                     }
                 case "world":
                     input.yield("and\nuniverse")
