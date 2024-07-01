@@ -24,7 +24,12 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 //
+
+#if swift(>=6.0)
+public import Foundation
+#else
 import Foundation
+#endif
 
 /// Interface representing input to the process
 public struct Input {

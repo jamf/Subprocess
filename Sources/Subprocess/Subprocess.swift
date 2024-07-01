@@ -25,8 +25,13 @@
 //  SOFTWARE.
 //
 
+#if swift(>=6.0)
+public import Foundation
+public import Combine
+#else
 import Foundation
 import Combine
+#endif
 
 /// Class used for asynchronous process execution
 public class Subprocess: @unchecked Sendable {

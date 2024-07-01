@@ -25,7 +25,11 @@
 //  SOFTWARE.
 //
 
+#if swift(>=6.0)
+public import Foundation
+#else
 import Foundation
+#endif
 
 extension AsyncStream.Continuation where Element == UInt8 {
     /// Resume the task awaiting the next iteration point by having it return

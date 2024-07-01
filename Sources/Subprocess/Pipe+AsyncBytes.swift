@@ -25,7 +25,11 @@
 //  SOFTWARE.
 //
 
+#if swift(>=6.0)
+public import Foundation
+#else
 import Foundation
+#endif
 
 // `FileHandle.AsyncBytes` has a bug that can block reading of stdout when also reading stderr.
 // We can avoid this problem if we create independent handlers.

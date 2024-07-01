@@ -25,8 +25,11 @@
 //  SOFTWARE.
 //
 
+#if swift(>=6.0)
+public import Foundation
+public import Subprocess
+#else
 import Foundation
-#if !COCOA_PODS
 import Subprocess
 #endif
 

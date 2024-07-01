@@ -25,10 +25,12 @@
 //  SOFTWARE.
 //
 
+#if swift(>=6.0)
+public import Foundation
+#else
 import Foundation
-#if !COCOA_PODS
-import Subprocess
 #endif
+import Subprocess
 
 /// Error representing a failed call to Subprocess.expect or Shell.expect
 public struct ExpectationError: Error {
@@ -66,11 +68,11 @@ public extension SubprocessMockObject {
     static func reset() { MockSubprocessDependencyBuilder.shared.reset() }
 }
 
-public class MockFileHandle: FileHandle {
+public class MockFileHandle: FileHandle, @unchecked Sendable {
     public var url: URL?
 }
 
-public final class MockPipe: Pipe {
+public final class MockPipe: Pipe, @unchecked Sendable {
     private static let queue = DispatchQueue(label: "\(MockPipe.self)")
     private var _data: Data?
     public var data: Data? {

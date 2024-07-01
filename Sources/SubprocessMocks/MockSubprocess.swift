@@ -25,9 +25,13 @@
 //  SOFTWARE.
 //
 
+#if swift(>=6.0)
+public import Foundation
+public import Combine
+public import Subprocess
+#else
 import Foundation
 import Combine
-#if !COCOA_PODS
 import Subprocess
 #endif
 
