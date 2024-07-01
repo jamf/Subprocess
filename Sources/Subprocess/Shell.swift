@@ -25,7 +25,11 @@
 //  SOFTWARE.
 //
 
+#if swift(>=6.0)
+public import Foundation
+#else
 import Foundation
+#endif
 
 /// Class used for synchronous process execution
 @available(*, deprecated, message: "Use Swift Concurrency methods instead which are part of the Subprocess class")

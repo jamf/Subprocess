@@ -25,7 +25,11 @@
 //  SOFTWARE.
 //
 
+#if swift(>=6.0)
+public import Foundation
+#else
 import Foundation
+#endif
 
 /// Protocol call used for dependency injection
 public protocol SubprocessDependencyFactory {

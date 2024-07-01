@@ -25,10 +25,12 @@
 //  SOFTWARE.
 //
 
+#if swift(>=6.0)
+public import Foundation
+#else
 import Foundation
-#if !COCOA_PODS
-import Subprocess
 #endif
+import Subprocess
 
 /// Interface used for mocking a process
 public struct MockProcess: Sendable {
@@ -66,7 +68,7 @@ public struct MockProcess: Sendable {
 }
 
 /// Subclass of `Process` used for mocking
-open class MockProcessReference: Process {
+open class MockProcessReference: Process, @unchecked Sendable {
     /// Context information and values used for overriden properties
     public struct Context {
 

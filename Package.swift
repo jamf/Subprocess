@@ -54,7 +54,8 @@ let package = Package(
                 .target(name: "Subprocess")
             ]
         )
-    ]
+    ],
+    swiftLanguageVersions: [.v5, .version("6")]
 )
 
 for target in package.targets {
@@ -65,60 +66,24 @@ for target in package.targets {
     // as upcoming features will result in a compiler error. Currently in the
     // latest 5.10 compiler this doesn't happen, the compiler ignores it.
     //
-    // If the situation does change and enabling default language features
-    // does result in an error in future versions we attempt to guard against
-    // this by using the hasFeature(x) compiler directive to see if we have a
-    // feature already, or if we can enable it. It's safe to enable features
-    // that don't exist in older compiler versions as the compiler will ignore
-    // features it doesn't have implemented.
-    
-    // swift 6
-    #if !hasFeature(ConciseMagicFile)
-    swiftSettings.append(.enableUpcomingFeature("ConciseMagicFile"))
-    #endif
-
-    #if !hasFeature(ForwardTrailingClosures)
-    swiftSettings.append(.enableUpcomingFeature("ForwardTrailingClosures"))
-    #endif
-
-    #if !hasFeature(StrictConcurrency)
-    swiftSettings.append(.enableUpcomingFeature("StrictConcurrency"))
-    // StrictConcurrency is under experimental features in Swift <=5.10 contrary to some posts and documentation
-    swiftSettings.append(.enableExperimentalFeature("StrictConcurrency"))
-    #endif
-
-    #if !hasFeature(BareSlashRegexLiterals)
-    swiftSettings.append(.enableUpcomingFeature("BareSlashRegexLiterals"))
-    #endif
-
-    #if !hasFeature(ImplicitOpenExistentials)
-    swiftSettings.append(.enableUpcomingFeature("ImplicitOpenExistentials"))
-    #endif
-
-    #if !hasFeature(ImportObjcForwardDeclarations)
-    swiftSettings.append(.enableUpcomingFeature("ImportObjcForwardDeclarations"))
-    #endif
-
-    #if !hasFeature(DisableOutwardActorInference)
-    swiftSettings.append(.enableUpcomingFeature("DisableOutwardActorInference"))
-    #endif
-
-    #if !hasFeature(InternalImportsByDefault)
-    swiftSettings.append(.enableUpcomingFeature("InternalImportsByDefault"))
-    #endif
-    
-    #if !hasFeature(IsolatedDefaultValues)
-    swiftSettings.append(.enableUpcomingFeature("IsolatedDefaultValues"))
-    #endif
-    
-    #if !hasFeature(GlobalConcurrency)
-    swiftSettings.append(.enableUpcomingFeature("GlobalConcurrency"))
-    #endif
+    // The Swift 6 compiler on the other hand does emit errors when features
+    // are enabled. Unfortunately it appears that the preprocessor
+    // !hasFeature(xxx) cannot be used to test for this situation nor does
+    // #if swift(<6) guard against this. There must be some sort of magic
+    // used that is special for compiling the Package.swift manifest.
+    // Instead a versioned Package.swift can be used (e.g. Package@swift-5.10.swift)
+    // and the implemented now default features can be removed in Package.swift.
+    //
+    // Or you can just delete the Swift 6 features that are enabled instead of
+    // creating another manifest file and test to see if building under Swift 5
+    // still works (it should almost always work).
+    //
+    // It's still safe to enable features that don't exist in older compiler
+    // versions as the compiler will ignore features it doesn't have implemented.
 
     // swift 7
-    #if !hasFeature(ExistentialAny)
     swiftSettings.append(.enableUpcomingFeature("ExistentialAny"))
-    #endif
+    swiftSettings.append(.enableUpcomingFeature("InternalImportsByDefault"))
     
     target.swiftSettings = swiftSettings
 }

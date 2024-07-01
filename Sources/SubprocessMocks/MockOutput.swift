@@ -25,7 +25,11 @@
 //  SOFTWARE.
 //
 
+#if swift(>=6.0)
+public import Foundation
+#else
 import Foundation
+#endif
 
 /// A way to supply data to mock methods
 public protocol MockOutput: Sendable {
