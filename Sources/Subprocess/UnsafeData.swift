@@ -25,7 +25,7 @@
 //  SOFTWARE.
 //
 
-import Foundation
+public import Foundation
 
 // Avoids errors for modifying data in concurrent contexts when we know it's safe to do so.
 final class UnsafeData: @unchecked Sendable {

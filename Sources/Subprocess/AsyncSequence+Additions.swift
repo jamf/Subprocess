@@ -25,7 +25,7 @@
 //  SOFTWARE.
 //
 
-import Foundation
+public import Foundation
 
 extension AsyncSequence {
     /// Returns a sequence of all the elements.

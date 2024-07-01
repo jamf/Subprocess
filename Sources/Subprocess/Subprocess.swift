@@ -25,8 +25,8 @@
 //  SOFTWARE.
 //
 
-import Foundation
-import Combine
+public import Foundation
+public import Combine
 
 /// Class used for asynchronous process execution
 public class Subprocess: @unchecked Sendable {

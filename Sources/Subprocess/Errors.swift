@@ -25,7 +25,7 @@
 //  SOFTWARE.
 //
 
-import Foundation
+public import Foundation
 
 /// Type representing possible errors
 @available(*, deprecated, message: "This type is no longer used with non-deprecated methods")

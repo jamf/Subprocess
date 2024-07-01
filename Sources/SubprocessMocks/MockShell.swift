@@ -25,7 +25,7 @@
 //  SOFTWARE.
 //
 
-import Foundation
+public import Foundation
 #if !COCOA_PODS
 import Subprocess
 #endif

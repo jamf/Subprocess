@@ -25,7 +25,7 @@
 //  SOFTWARE.
 //
 
-import Foundation
+public import Foundation
 
 // `FileHandle.AsyncBytes` has a bug that can block reading of stdout when also reading stderr.
 // We can avoid this problem if we create independent handlers.

@@ -24,7 +24,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 //
-import Foundation
+public import Foundation
 
 /// Interface representing input to the process
 public struct Input {

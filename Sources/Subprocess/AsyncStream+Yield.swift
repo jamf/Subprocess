@@ -25,7 +25,7 @@
 //  SOFTWARE.
 //
 
-import Foundation
+public import Foundation
 
 extension AsyncStream.Continuation where Element == UInt8 {
     /// Resume the task awaiting the next iteration point by having it return

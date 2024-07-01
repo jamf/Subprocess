@@ -25,7 +25,7 @@
 //  SOFTWARE.
 //
 
-import Foundation
+public import Foundation
 
 /// Protocol call used for dependency injection
 public protocol SubprocessDependencyFactory {

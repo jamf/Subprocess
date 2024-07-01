@@ -25,7 +25,7 @@
 //  SOFTWARE.
 //
 
-import Foundation
+public import Foundation
 
 /// Class used for synchronous process execution
 @available(*, deprecated, message: "Use Swift Concurrency methods instead which are part of the Subprocess class")

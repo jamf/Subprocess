@@ -25,7 +25,7 @@
 //  SOFTWARE.
 //
 
-import Foundation
+public import Foundation
 
 /// A way to supply data to mock methods
 public protocol MockOutput: Sendable {
