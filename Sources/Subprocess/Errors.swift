@@ -25,7 +25,11 @@
 //  SOFTWARE.
 //
 
+#if swift(>=6)
+public import Foundation
+#else
 import Foundation
+#endif
 
 /// Type representing possible errors
 @available(*, deprecated, message: "This type is no longer used with non-deprecated methods")
