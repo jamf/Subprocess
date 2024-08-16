@@ -30,10 +30,8 @@ import Foundation
 import Subprocess
 #endif
 
-@available(*, deprecated, message: "Swift Concurrency methods in Subprocess replace Shell")
 extension Shell: SubprocessMockObject {}
 
-@available(*, deprecated, message: "Swift Concurrency methods in Subprocess replace Shell")
 public extension Shell {
 
     /// Adds a mock for a command which throws an error when `Process.run` is called

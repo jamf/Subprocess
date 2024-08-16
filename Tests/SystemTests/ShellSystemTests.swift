@@ -1,7 +1,6 @@
 import XCTest
 @testable import Subprocess
 
-@available(*, deprecated, message: "Swift Concurrency methods in Subprocess replace Shell")
 final class ShellSystemTests: XCTestCase {
 
     override func setUp() {

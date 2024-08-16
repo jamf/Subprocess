@@ -28,7 +28,6 @@
 import Foundation
 
 /// Type representing possible errors
-@available(*, deprecated, message: "This type is no longer used with non-deprecated methods")
 public enum SubprocessError: Error {
 
     /// The process completed with a non-zero exit code
@@ -48,7 +47,6 @@ public enum SubprocessError: Error {
     case outputStringEncodingError
 }
 
-@available(*, deprecated, message: "This type is no longer used with non-deprecated methods")
 extension SubprocessError: LocalizedError {
     public var errorDescription: String? {
         switch self {
@@ -69,7 +67,6 @@ extension SubprocessError: LocalizedError {
 }
 
 /// Common NSError methods for better interop with Objective-C
-@available(*, deprecated, message: "This type is no longer used with non-deprecated methods")
 extension SubprocessError: CustomNSError {
     public var errorCode: Int {
         switch self {

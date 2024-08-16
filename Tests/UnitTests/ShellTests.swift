@@ -10,7 +10,6 @@ struct TestCodableObject: Codable, Equatable {
 }
 
 // swiftlint:disable control_statement duplicated_key_in_dictionary_literal
-@available(*, deprecated, message: "Swift Concurrency methods in Subprocess replace Shell")
 final class ShellTests: XCTestCase {
 
     let command = [ "/usr/local/bin/somefakeCommand", "foo", "bar" ]
