@@ -8,18 +8,22 @@ let package = Package(
     products: [
         .library(
             name: "Subprocess",
+            type: .static,
             targets: [ "Subprocess" ]
         ),
         .library(
             name: "SubprocessMocks",
+            type: .static,
             targets: [ "SubprocessMocks" ]
         ),
         .library(
             name: "libSubprocess",
+            type: .dynamic,
             targets: [ "Subprocess" ]
         ),
         .library(
             name: "libSubprocessMocks",
+            type: .dynamic,
             targets: [ "SubprocessMocks" ]
         )
     ],
