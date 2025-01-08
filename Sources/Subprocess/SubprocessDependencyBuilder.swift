@@ -56,7 +56,12 @@ public protocol SubprocessDependencyFactory {
 /// Default implementation of SubprocessDependencyFactory
 public struct SubprocessDependencyBuilder: SubprocessDependencyFactory {
     private static let queue = DispatchQueue(label: "\(Self.self)")
+
+    #if compiler(<5.10)
+    private static var _shared: any SubprocessDependencyFactory = SubprocessDependencyBuilder()
+    #else
     nonisolated(unsafe) private static var _shared: any SubprocessDependencyFactory = SubprocessDependencyBuilder()
+    #endif
     /// Shared instance used for dependency creation
     public static var shared: any SubprocessDependencyFactory {
         get {
