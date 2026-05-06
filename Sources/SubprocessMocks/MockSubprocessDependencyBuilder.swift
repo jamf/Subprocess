@@ -27,13 +27,14 @@
 
 #if swift(>=6.0)
 public import Foundation
+public import Subprocess
 #else
 import Foundation
-#endif
 import Subprocess
+#endif
 
 /// Error representing a failed call to Subprocess.expect or Shell.expect
-public struct ExpectationError: Error {
+public struct ExpectationError: Error, Sendable {
     /// Source file where expect was called
     public var file: StaticString
     /// Line number where expect was called
@@ -43,7 +44,7 @@ public struct ExpectationError: Error {
 }
 
 /// Type representing possible errors thrown
-public enum MockSubprocessError: Error {
+public enum MockSubprocessError: Error, Sendable {
     /// Error containing command thrown when a process is launched that was not stubbed
     case missingMock([String])
     /// List of expectations which failed
@@ -89,8 +90,8 @@ public final class MockPipe: Pipe, @unchecked Sendable {
     }
 }
 
-class MockSubprocessDependencyBuilder {
-    class MockItem {
+public final class MockSubprocessDependencyBuilder: Sendable {
+    final class MockItem {
         var used = false
         var command: [String]
         var input: Input?
@@ -107,18 +108,33 @@ class MockSubprocessDependencyBuilder {
         }
     }
 
-    var mocks: [MockItem] = []
+    private let mocksLock = NSLock()
+    private nonisolated(unsafe) var _mocks: [MockItem] = []
+    var mocks: [MockItem] {
+        get {
+            mocksLock.withLock {
+                _mocks
+            }
+        }
+        set {
+            mocksLock.withLock {
+                _mocks = newValue
+            }
+        }
+    }
 
-    nonisolated(unsafe) static let shared = MockSubprocessDependencyBuilder()
+    @TaskLocal public static var shared = MockSubprocessDependencyBuilder()
 
-    init() { SubprocessDependencyBuilder.shared = self }
+    public init() {
+        // public for SubprocessTesting target
+    }
 
-    func stub(_ command: [String], process: MockProcessReference) {
+    public func stub(_ command: [String], process: MockProcessReference) {
         let mock = MockItem(command: command, input: nil, process: process, file: nil, line: nil)
         mocks.append(mock)
     }
 
-    func expect(_ command: [String], input: Input?, process: MockProcessReference, file: StaticString, line: UInt) {
+    public func expect(_ command: [String], input: Input?, process: MockProcessReference, file: StaticString, line: UInt) {
         let mock = MockItem(command: command, input: input, process: process, file: file, line: line)
         mocks.append(mock)
     }
@@ -229,7 +245,7 @@ class MockSubprocessDependencyBuilder {
 }
 
 extension MockSubprocessDependencyBuilder: SubprocessDependencyFactory {
-    func makeProcess(command: [String]) -> Process {
+    public func makeProcess(command: [String]) -> Process {
         if let item = mocks.first(where: { !$0.used && $0.command == command }) {
             item.used = true
             return item.process
@@ -237,13 +253,13 @@ extension MockSubprocessDependencyBuilder: SubprocessDependencyFactory {
         return MockProcessReference(withRunError: MockSubprocessError.missingMock(command))
     }
 
-    func makeInputFileHandle(url: URL) throws -> FileHandle {
+    public func makeInputFileHandle(url: URL) throws -> FileHandle {
         let handle = MockFileHandle()
         handle.url = url
         return handle
     }
     
-    func makeInputPipe<Input>(sequence: Input) throws -> Pipe where Input : AsyncSequence & Sendable, Input.Element == UInt8 {
+    public func makeInputPipe<Input>(sequence: Input) throws -> Pipe where Input : AsyncSequence & Sendable, Input.Element == UInt8 {
         let semaphore = DispatchSemaphore(value: 0)
         let pipe = MockPipe()
         

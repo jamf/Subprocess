@@ -34,7 +34,6 @@ import Subprocess
 
 /// Interface used for mocking a process
 public struct MockProcess: Sendable {
-
     /// The underlying `MockProcessReference`
     public var reference: MockProcessReference
 
@@ -70,10 +69,9 @@ public struct MockProcess: Sendable {
 /// Subclass of `Process` used for mocking
 open class MockProcessReference: Process, @unchecked Sendable {
     /// Context information and values used for overriden properties
-    public struct Context {
-
+    public struct Context: Sendable {
         /// State of the mock process
-        public enum State {
+        public enum State: Sendable {
             case initialized
             case running
             case uncaughtSignal
@@ -84,11 +82,11 @@ open class MockProcessReference: Process, @unchecked Sendable {
         public var state: State = .initialized
 
         /// Block called to stub the call to launch
-        public var runStub: (MockProcess) throws -> Void
+        public var runStub: @Sendable (MockProcess) throws -> Void
 
-        var standardInput: Any?
-        var standardOutput: Any?
-        var standardError: Any?
+        nonisolated(unsafe) var standardInput: Any?
+        nonisolated(unsafe) var standardOutput: Any?
+        nonisolated(unsafe) var standardError: Any?
         var terminationHandler: (@Sendable (Process) -> Void)?
     }
 

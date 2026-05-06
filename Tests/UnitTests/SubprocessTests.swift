@@ -1,7 +1,7 @@
 import XCTest
 @testable import Subprocess
 #if !COCOA_PODS
-@testable import SubprocessMocks
+import SubprocessMocks
 #endif
 
 // swiftlint:disable duplicated_key_in_dictionary_literal

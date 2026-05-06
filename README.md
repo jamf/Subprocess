@@ -185,11 +185,83 @@ let package = Package(
     ]
 )
 ```
-### Cocoapods
-```ruby
-pod 'Subprocess'
+
+## Unit Testing with Swift Testing
+
+Add `SubprocessMocks` and `SubprocessTesting` as dependencies of your test target:
+
+```swift
+.testTarget(
+    name: "MyTests",
+    dependencies: [
+        .product(name: "SubprocessMocks", package: "Subprocess"),
+        .product(name: "SubprocessTesting", package: "Subprocess"),
+    ]
+)
 ```
-### Carthage
-```ruby
-github 'jamf/Subprocess'
+
+### SubprocessTrait
+
+`SubprocessTrait` is a Swift Testing `TestTrait` and `SuiteTrait` that automatically scopes subprocess mocking to each test. Each test gets its own isolated `MockSubprocessDependencyBuilder` via `@TaskLocal`, so tests can safely run in parallel without interfering with each other.
+
+Apply `.subprocessTesting` to any `@Test` or `@Suite`:
+
+```swift
+import Testing
+import Subprocess
+import SubprocessMocks
+import SubprocessTesting
+
+@Test(.subprocessTesting)
+func testSoftwareVersion() async throws {
+    Subprocess.expect(["/usr/bin/sw_vers", "-productVersion"], standardOutput: "15.0\n".data(using: .utf8))
+
+    let version = try await Subprocess.string(for: ["/usr/bin/sw_vers", "-productVersion"])
+
+    #expect(version.trimmingCharacters(in: .whitespacesAndNewlines) == "15.0")
+    try Subprocess.verify()
+}
+```
+
+Apply it to a whole suite to cover every test in the type:
+
+```swift
+@Suite(.subprocessTesting)
+struct MyCommandTests {
+    @Test
+    func testGrep() async throws {
+        Subprocess.expect(["/usr/bin/grep", "foo"], standardOutput: "foo bar\n".data(using: .utf8))
+
+        let result = try await Subprocess.string(for: ["/usr/bin/grep", "foo"])
+
+        #expect(result.contains("foo"))
+        try Subprocess.verify()
+    }
+
+    @Test
+    func testMissingFile() async throws {
+        let error = NSError(domain: NSPOSIXErrorDomain, code: Int(ENOENT))
+        Subprocess.expect(["/bin/cat", "/no/such/file"], error: error)
+
+        await #expect(throws: (any Error).self) {
+            try await Subprocess.data(for: ["/bin/cat", "/no/such/file"])
+        }
+    }
+}
+```
+
+### Parallel tests
+
+Because each test's mocks are stored in a `@TaskLocal`, parameterised and parallel tests work without any extra setup:
+
+```swift
+@Test(.subprocessTesting, arguments: ["foo", "bar", "baz"])
+func testEcho(_ word: String) async throws {
+    Subprocess.expect(["/bin/echo", word], standardOutput: "\(word)\n".data(using: .utf8))
+
+    let output = try await Subprocess.string(for: ["/bin/echo", word])
+
+    #expect(output.trimmingCharacters(in: .whitespacesAndNewlines) == word)
+    try Subprocess.verify()
+}
 ```

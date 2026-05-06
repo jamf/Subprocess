@@ -32,7 +32,7 @@ import Foundation
 #endif
 
 /// Protocol call used for dependency injection
-public protocol SubprocessDependencyFactory {
+public protocol SubprocessDependencyFactory: Sendable {
     /// Creates new Subprocess
     ///
     /// - Parameter command: Command represented as an array of strings
@@ -56,17 +56,17 @@ public protocol SubprocessDependencyFactory {
 /// Default implementation of SubprocessDependencyFactory
 public struct SubprocessDependencyBuilder: SubprocessDependencyFactory {
     private static let queue = DispatchQueue(label: "\(Self.self)")
-
-    #if compiler(<5.10)
-    private static var _shared: any SubprocessDependencyFactory = SubprocessDependencyBuilder()
-    #else
     nonisolated(unsafe) private static var _shared: any SubprocessDependencyFactory = SubprocessDependencyBuilder()
-    #endif
+    @TaskLocal public static var __shared: (any SubprocessDependencyFactory)?
     /// Shared instance used for dependency creation
     public static var shared: any SubprocessDependencyFactory {
         get {
-            queue.sync {
-                _shared
+            if let value = __shared {
+                value
+            } else {
+                queue.sync {
+                    _shared
+                }
             }
         }
         set {
