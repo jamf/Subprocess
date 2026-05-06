@@ -71,6 +71,39 @@ public extension SubprocessMockObject {
 
 public class MockFileHandle: FileHandle, @unchecked Sendable {
     public var url: URL?
+    
+    private let backing: FileHandle
+
+    public override init(fileDescriptor fd: Int32, closeOnDealloc closeopt: Bool) {
+        backing = FileHandle(fileDescriptor: fd, closeOnDealloc: closeopt)
+        super.init(fileDescriptor: fd, closeOnDealloc: closeopt)
+    }
+    
+    init(backing: FileHandle = Pipe().fileHandleForReading) {
+        self.backing = backing
+        super.init(fileDescriptor: backing.fileDescriptor, closeOnDealloc: false)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    public override var fileDescriptor: Int32 {
+        backing.fileDescriptor
+    }
+
+    // If your tests use these APIs, forward them as well:
+    public override func readDataToEndOfFile() -> Data {
+        backing.readDataToEndOfFile()
+    }
+
+    public override func write(_ data: Data) {
+        backing.write(data)
+    }
+
+    public override func closeFile() {
+        backing.closeFile()
+    }
 }
 
 public final class MockPipe: Pipe, @unchecked Sendable {

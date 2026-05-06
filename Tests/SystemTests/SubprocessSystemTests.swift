@@ -4,9 +4,9 @@ import XCTest
 final class SubprocessSystemTests: XCTestCase {
     let softwareVersionFilePath = "/System/Library/CoreServices/SystemVersion.plist"
     
-//    override func setUp() {
-//        SubprocessDependencyBuilder.shared = SubprocessDependencyBuilder()
-//    }
+    override func setUp() {
+        SubprocessDependencyBuilder.shared = SubprocessDependencyBuilder()
+    }
     
     @available(macOS 12.0, *)
     func testRunWithOutput() async throws {

@@ -8,7 +8,7 @@ import SubprocessMocks
 final class SubprocessTests: XCTestCase {
 
     let command = [ "/usr/local/bin/somefakeCommand", "foo", "bar" ]
-
+    
     override func setUp() {
         // This is only needed for SwiftPM since it runs all of the test suites as a single test run
         SubprocessDependencyBuilder.shared = MockSubprocessDependencyBuilder.shared

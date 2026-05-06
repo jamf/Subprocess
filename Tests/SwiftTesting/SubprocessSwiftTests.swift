@@ -44,7 +44,8 @@ struct SubprocessSwiftTests: ~Copyable {
         }()
         
         let fileContents = try await Subprocess.string(for: ["/bin/cat", testFileURL.path])
-        try #expect(fileContents == String(contentsOfFile: testFileURL.path, encoding: .utf8))
+        let stringFileContents = try String(contentsOfFile: testFileURL.path, encoding: .utf8)
+        #expect(fileContents == stringFileContents)
         try FileManager.default.removeItem(at: testFileURL)
     }
     
