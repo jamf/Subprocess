@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 5.10
 
 import PackageDescription
 
@@ -13,6 +13,10 @@ let package = Package(
         .library(
             name: "SubprocessMocks",
             targets: [ "SubprocessMocks" ]
+        ),
+        .library(
+            name: "SubprocessTesting",
+            targets: ["SubprocessTesting"]
         ),
         .library(
             name: "libSubprocess",
@@ -37,6 +41,7 @@ let package = Package(
                 .target(name: "Subprocess")
             ]
         ),
+        .target(name: "SubprocessTesting", dependencies: ["Subprocess", "SubprocessMocks"]),
         .testTarget(
             name: "UnitTests",
             dependencies: [
@@ -48,6 +53,12 @@ let package = Package(
             name: "SystemTests",
             dependencies: [
                 .target(name: "Subprocess")
+            ]
+        ),
+        .testTarget(
+            name: "SwiftTesting",
+            dependencies: [
+                .target(name: "SubprocessTesting")
             ]
         )
     ],

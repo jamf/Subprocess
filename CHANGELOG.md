@@ -7,6 +7,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0] - 2026-05-05
+
+### Added
+- New `SubprocessTesting` library target providing `SubprocessTrait` — a Swift Testing `TestTrait`/`SuiteTrait` that scopes subprocess mocking to individual tests via `@TaskLocal`, enabling safe parallel test execution.
+- `SwiftTesting` test target with suite demonstrating parallel mock usage using Swift Testing.
+
+### Changed
+- `SubprocessDependencyFactory` now conforms to `Sendable`.
+- `MockSubprocessDependencyBuilder` is now `public final` and `Sendable`; its `shared` instance is `@TaskLocal` instead of a `nonisolated(unsafe)` static, removing the need to manually reset it between tests.
+- `MockSubprocessDependencyBuilder.makeProcess`, `makeInputFileHandle`, and `makeInputPipe` are now `public` to support the new `SubprocessTesting` target.
+- `MockProcess.Context`, `MockProcess.Context.State`, `ExpectationError`, and `MockSubprocessError` now conform to `Sendable`.
+- `MockProcess.Context.runStub` closure is now `@Sendable`.
+- `MockProcess.Context` standard I/O properties marked `nonisolated(unsafe)` for `Sendable` conformance.
+- All `Shell.expect` and `Subprocess.expect` overloads now use `#filePath` instead of `#file` for the default `file:` argument.
+- Unit tests import `SubprocessMocks` publicly instead of `@testable`.
+- `swift-tools-version` bumped to `5.10`.
+
 ## [3.0.5] - 2024-08-07
 
 ### Changed

@@ -104,9 +104,9 @@ public extension Subprocess {
     ///     - command: The command to mock
     ///     - input: The expected input of the process
     ///     - error: Error thrown when `Process.run` is called
-    ///     - file: Source file where expect was called (Default: #file)
+    ///     - file: Source file where expect was called (Default: #filePath)
     ///     - line: Line number of source file where expect was called (Default: #line)
-    static func expect(_ command: [String], input: Input? = nil, error: any Swift.Error, file: StaticString = #file, line: UInt = #line) {
+    static func expect(_ command: [String], input: Input? = nil, error: any Swift.Error, file: StaticString = #filePath, line: UInt = #line) {
         let mock = MockProcessReference(withRunError: error)
         MockSubprocessDependencyBuilder.shared.expect(command, input: input, process: mock, file: file, line: line)
     }
@@ -117,10 +117,10 @@ public extension Subprocess {
     /// - Parameters:
     ///     - command: The command to mock
     ///     - input: The expected input of the process
-    ///     - file: Source file where expect was called (Default: #file)
+    ///     - file: Source file where expect was called (Default: #filePath)
     ///     - line: Line number of source file where expect was called (Default: #line)
     ///     - runBlock: Block called with a `MockProcess` to mock process execution
-    static func expect(_ command: [String], input: Input? = nil, file: StaticString = #file, line: UInt = #line, runBlock: (@Sendable (MockProcess) -> Void)? = nil) {
+    static func expect(_ command: [String], input: Input? = nil, file: StaticString = #filePath, line: UInt = #line, runBlock: (@Sendable (MockProcess) -> Void)? = nil) {
         let mock = MockProcessReference(withRunBlock: runBlock ?? { $0.exit() })
         MockSubprocessDependencyBuilder.shared.expect(command, input: input, process: mock, file: file, line: line)
     }
@@ -132,7 +132,7 @@ public extension Subprocess {
     ///     - standardOutput: Data written to stdout of the process
     ///     - standardError: Data written to stderr of the process
     ///     - exitCode: Exit code of the process (Default: 0)
-    static func expect(_ command: [String], standardOutput: (any MockOutput)? = nil, standardError: (any MockOutput)? = nil, input: Input? = nil, exitCode: Int32 = 0, file: StaticString = #file, line: UInt = #line) {
+    static func expect(_ command: [String], standardOutput: (any MockOutput)? = nil, standardError: (any MockOutput)? = nil, input: Input? = nil, exitCode: Int32 = 0, file: StaticString = #filePath, line: UInt = #line) {
         expect(command, input: input, file: file, line: line) { process in
             if let data = standardOutput {
                 process.writeTo(stdout: data)
@@ -155,7 +155,7 @@ public extension Subprocess {
     ///     - encoder: `TopLevelEncoder` used to encoder `content` into `Data`.
     ///     - exitCode: Exit code of the process (Default: 0)
     /// - Throws: Error when encoding the provided object
-    static func expect<Content, Encoder>(_ command: [String], content: Content, encoder: Encoder, input: Input? = nil, exitCode: Int32 = 0, file: StaticString = #file, line: UInt = #line) throws where Content : Encodable, Encoder : TopLevelEncoder, Encoder.Output == Data {
+    static func expect<Content, Encoder>(_ command: [String], content: Content, encoder: Encoder, input: Input? = nil, exitCode: Int32 = 0, file: StaticString = #filePath, line: UInt = #line) throws where Content : Encodable, Encoder : TopLevelEncoder, Encoder.Output == Data {
         let data: Data = try encoder.encode(content)
         
         expect(command, standardOutput: data, input: input, exitCode: exitCode, file: file, line: line)

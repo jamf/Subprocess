@@ -1,7 +1,7 @@
 import XCTest
 @testable import Subprocess
 #if !COCOA_PODS
-@testable import SubprocessMocks
+import SubprocessMocks
 #endif
 
 struct TestCodableObject: Codable, Equatable {

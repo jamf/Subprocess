@@ -1,14 +1,14 @@
 import XCTest
 @testable import Subprocess
 #if !COCOA_PODS
-@testable import SubprocessMocks
+import SubprocessMocks
 #endif
 
 // swiftlint:disable duplicated_key_in_dictionary_literal
 final class SubprocessTests: XCTestCase {
 
     let command = [ "/usr/local/bin/somefakeCommand", "foo", "bar" ]
-
+    
     override func setUp() {
         // This is only needed for SwiftPM since it runs all of the test suites as a single test run
         SubprocessDependencyBuilder.shared = MockSubprocessDependencyBuilder.shared
