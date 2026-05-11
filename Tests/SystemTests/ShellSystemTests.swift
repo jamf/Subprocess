@@ -3,11 +3,6 @@ import XCTest
 
 @available(*, deprecated, message: "Swift Concurrency methods in Subprocess replace Shell")
 final class ShellSystemTests: XCTestCase {
-
-    override func setUp() {
-        SubprocessDependencyBuilder.shared = SubprocessDependencyBuilder()
-    }
-
     let softwareVersionFilePath = "/System/Library/CoreServices/SystemVersion.plist"
 
     // MARK: Input values

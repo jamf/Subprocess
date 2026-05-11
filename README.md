@@ -204,7 +204,7 @@ Add `SubprocessMocks` and `SubprocessTesting` as dependencies of your test targe
 
 `SubprocessTrait` is a Swift Testing `TestTrait` and `SuiteTrait` that automatically scopes subprocess mocking to each test. Each test gets its own isolated `MockSubprocessDependencyBuilder` via `@TaskLocal`, so tests can safely run in parallel without interfering with each other.
 
-Apply `.subprocessTesting` to any `@Test` or `@Suite`:
+Apply `.subprocess` to any `@Test` or `@Suite`:
 
 ```swift
 import Testing
@@ -212,7 +212,7 @@ import Subprocess
 import SubprocessMocks
 import SubprocessTesting
 
-@Test(.subprocessTesting)
+@Test(.subprocess)
 func testSoftwareVersion() async throws {
     Subprocess.expect(["/usr/bin/sw_vers", "-productVersion"], standardOutput: "15.0\n".data(using: .utf8))
 
@@ -226,7 +226,7 @@ func testSoftwareVersion() async throws {
 Apply it to a whole suite to cover every test in the type:
 
 ```swift
-@Suite(.subprocessTesting)
+@Suite(.subprocess)
 struct MyCommandTests {
     @Test
     func testGrep() async throws {
@@ -255,7 +255,7 @@ struct MyCommandTests {
 Because each test's mocks are stored in a `@TaskLocal`, parameterised and parallel tests work without any extra setup:
 
 ```swift
-@Test(.subprocessTesting, arguments: ["foo", "bar", "baz"])
+@Test(.subprocess, arguments: ["foo", "bar", "baz"])
 func testEcho(_ word: String) async throws {
     Subprocess.expect(["/bin/echo", word], standardOutput: "\(word)\n".data(using: .utf8))
 
@@ -263,5 +263,21 @@ func testEcho(_ word: String) async throws {
 
     #expect(output.trimmingCharacters(in: .whitespacesAndNewlines) == word)
     try Subprocess.verify()
+}
+```
+
+## Unit Testing with XCTest
+
+Since it's not entirely impossible that other tests may need to use `Subprocess` directly any legacy `XCTest`s should now manually setup and tear down the mock dependency builder as shown in the example below.
+
+```swift
+final class SubprocessTests: XCTestCase {
+    override func setUp() {
+        Subprocess.setupMockBuilder()
+    }
+
+    override func tearDown() {
+        Subprocess.reset()
+    }
 }
 ```

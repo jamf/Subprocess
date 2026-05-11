@@ -27,10 +27,10 @@
 
 #if swift(>=6.0)
 public import Foundation
-public import Subprocess
+@testable public import Subprocess
 #else
 import Foundation
-import Subprocess
+@testable import Subprocess
 #endif
 
 /// Error representing a failed call to Subprocess.expect or Shell.expect
@@ -54,7 +54,11 @@ public enum MockSubprocessError: Error, Sendable {
 public protocol SubprocessMockObject {}
 
 public extension SubprocessMockObject {
-
+    /// Setup mocking
+    static func setupMockBuilder() {
+        SubprocessDependencyBuilder.shared = MockSubprocessDependencyBuilder.shared
+    }
+    
     /// Verifies expected stubs and resets mocking
     /// - Throws: A `MockSubprocessError.missedExpectations` containing failed expectations
     static func verify() throws { try MockSubprocessDependencyBuilder.shared.verify() }
@@ -66,7 +70,10 @@ public extension SubprocessMockObject {
     }
 
     /// Resets mocking
-    static func reset() { MockSubprocessDependencyBuilder.shared.reset() }
+    static func reset() {
+        MockSubprocessDependencyBuilder.shared.reset()
+        SubprocessDependencyBuilder.shared = SubprocessDependencyBuilder()
+    }
 }
 
 public class MockFileHandle: FileHandle, @unchecked Sendable {
