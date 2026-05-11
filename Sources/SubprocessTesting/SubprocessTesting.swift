@@ -31,10 +31,17 @@ public struct SubprocessTrait: TestTrait, SuiteTrait, TestScoping {
 }
 
 extension Trait where Self == SubprocessTrait {
+    @available(*, deprecated, renamed: "subprocess")
     public static var subprocessTesting: Self {
         SubprocessTrait()
     }
     
+    /// Creates an isolated mock subprocess dependency builder for the current test task
+    public static var subprocess: Self {
+        SubprocessTrait()
+    }
+    
+    /// Uses the supplied mock subprocess dependency builder for the current test task
     public static func subprocessBuilder(_ builder: MockSubprocessDependencyBuilder) -> Self {
         SubprocessTrait(builder: builder)
     }

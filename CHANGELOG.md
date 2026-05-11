@@ -7,6 +7,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.1] - 2026-05-11
+
+### Added
+- `SubprocessMockObject` now provides a `setupMockBuilder()` static method (e.g. `Shell.setupMockBuilder()`, `Subprocess.setupMockBuilder()`) to wire up the mock dependency builder, replacing direct assignment to `SubprocessDependencyBuilder.shared`.
+
+### Changed
+- `SubprocessMockObject.reset()` now also restores `SubprocessDependencyBuilder.shared` to a real instance, so XCTest `tearDown` no longer needs to do it manually.
+- `SubprocessMocks` imports `Subprocess` with `@testable` to expose internal APIs required for mocking.
+- `.subprocessTesting` trait on `Trait where Self == SubprocessTrait` is deprecated and renamed to `.subprocess`.
+
 ## [4.0.0] - 2026-05-05
 
 ### Added

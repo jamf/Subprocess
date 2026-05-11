@@ -4,10 +4,6 @@ import XCTest
 final class SubprocessSystemTests: XCTestCase {
     let softwareVersionFilePath = "/System/Library/CoreServices/SystemVersion.plist"
     
-    override func setUp() {
-        SubprocessDependencyBuilder.shared = SubprocessDependencyBuilder()
-    }
-    
     @available(macOS 12.0, *)
     func testRunWithOutput() async throws {
         let result = try await Subprocess(["/bin/cat", softwareVersionFilePath]).run().standardOutput.lines.first(where: { $0.contains("ProductName") }) != nil
