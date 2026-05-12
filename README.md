@@ -223,10 +223,11 @@ func testSoftwareVersion() async throws {
 }
 ```
 
-Apply it to a whole suite to cover every test in the type:
+Apply it to a whole suite to cover every test in the type (all tests inherit the suite level shared `@TaskLock`):
 
 ```swift
-@Suite(.subprocess)
+// Using `.subprocess` at the suite level you will almost certainly need to also use `.serialized`
+@Suite(.serialized, .subprocess)
 struct MyCommandTests {
     @Test
     func testGrep() async throws {
