@@ -7,7 +7,7 @@ import SubprocessTesting
 
 @Suite
 struct SubprocessSwiftTests: ~Copyable {
-    @Test(.subprocessTesting, arguments: 0..<100)
+    @Test(.subprocess, arguments: 0..<100)
     func `mocks can handle parallel testing`(_ count: Int) async throws {
         let testFileURL = URL(fileURLWithPath: "/tmp/\(Self.self)-\(UUID().uuidString).txt")
         
@@ -35,7 +35,7 @@ struct SubprocessSwiftTests: ~Copyable {
     }
     
     @Test(arguments: 0..<5)
-    func `other testing still works`(_ count: Int) async throws {
+    func `direct test of command still works`(_ count: Int) async throws {
         let testFileURL: URL = {
             let url = URL(fileURLWithPath: "/tmp/\(Self.self)-\(UUID().uuidString).txt")
             
@@ -49,8 +49,8 @@ struct SubprocessSwiftTests: ~Copyable {
         try FileManager.default.removeItem(at: testFileURL)
     }
     
-    @Test(.subprocessTesting, arguments: ["foo", "bar", "baz"])
-    func testEcho(_ word: String) async throws {
+    @Test(.subprocess, arguments: ["foo", "bar", "baz"])
+    func echo(_ word: String) async throws {
         Subprocess.expect(["/bin/echo", word], standardOutput: "\(word)\n".data(using: .utf8))
 
         let output = try await Subprocess.string(for: ["/bin/echo", word])
@@ -59,8 +59,8 @@ struct SubprocessSwiftTests: ~Copyable {
         try Subprocess.verify()
     }
     
-    @Test(.subprocessTesting)
-    func testSoftwareVersion() async throws {
+    @Test(.subprocess)
+    func `software version`() async throws {
         Subprocess.expect(["/usr/bin/sw_vers", "-productVersion"], standardOutput: "15.0\n".data(using: .utf8))
 
         let version = try await Subprocess.string(for: ["/usr/bin/sw_vers", "-productVersion"])
@@ -70,10 +70,11 @@ struct SubprocessSwiftTests: ~Copyable {
     }
 }
 
-@Suite(.subprocessTesting)
+@Suite(.subprocess)
 struct MyCommandTests: ~Copyable {
-    @Test
-    func testGrep() async throws {
+    // must be serialized otherwise concurrent usage will race against the suite shared mock storage
+    @Test(.serialized, arguments: 0..<10)
+    func grep(count: Int) async throws {
         Subprocess.expect(["/usr/bin/grep", "foo"], standardOutput: "foo bar\n".data(using: .utf8))
 
         let result = try await Subprocess.string(for: ["/usr/bin/grep", "foo"])
@@ -83,13 +84,25 @@ struct MyCommandTests: ~Copyable {
     }
 
     @Test
-    func testMissingFile() async throws {
+    func `missing file`() async throws {
         let error = NSError(domain: NSPOSIXErrorDomain, code: Int(ENOENT))
         Subprocess.expect(["/bin/cat", "/no/such/file"], error: error)
 
         await #expect(throws: (any Error).self) {
             try await Subprocess.data(for: ["/bin/cat", "/no/such/file"])
         }
+    }
+    
+    // this test creates its own isolated mocks separate from the other tests
+    @Test(.subprocess, arguments: 0..<10)
+    func `grep returns an error`(count: Int) async throws {
+        let error = NSError(domain: NSPOSIXErrorDomain, code: Int(ENOENT))
+        Subprocess.expect(["/usr/bin/grep", "foo"], error: error)
+
+        await #expect(throws: (any Error).self) {
+            try await Subprocess.string(for: ["/usr/bin/grep", "foo"])
+        }
+        try Subprocess.verify()
     }
 }
 
